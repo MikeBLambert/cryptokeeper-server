@@ -4,7 +4,7 @@ const { Types } = require('mongoose');
 
 describe('account model', () => {
     it('validates a good model', () => {
-        const data  = {
+        const data = {
             user: Types.ObjectId(),
             currencies: [{
                 name: 'BTC',
