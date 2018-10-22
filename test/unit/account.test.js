@@ -23,7 +23,6 @@ describe('account model', () => {
 
         const account = new Account(data);
         const errors = getErrors(account.validateSync(), 2);
-        console.log('account & errors', account, errors.user);
 
         expect(errors.user.properties.message).toEqual('Path `user` is required.');
         expect(errors['currencies.0.name'].properties.message).toEqual('Path `name` is required.');
