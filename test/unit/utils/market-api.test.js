@@ -1,4 +1,4 @@
-const getPrices = require('../../lib/util/market-api');
+const getPrices = require('../../../lib/util/market-api');
 
 describe('market API', () => {
     it('returns market info for bitcoin', () => {

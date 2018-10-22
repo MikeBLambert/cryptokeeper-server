@@ -1,5 +1,5 @@
-const Account = require('../../lib/models/Account');
-const { getErrors } = require('../util/helpers');
+const Account = require('../../../lib/models/Account');
+const { getErrors } = require('../../util/helpers');
 const { Types } = require('mongoose');
 
 describe('account model', () => {

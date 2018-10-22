@@ -6,39 +6,46 @@ const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
 
-const { ResourceHelper } = require('../util/helpers');
-const rh = new ResourceHelper;
-
-
 
 const checkStatus = statusCode => res => {
     expect(res.status).toEqual(statusCode);
 };
 
+const checkOk = res => checkStatus(200)(res);
+
 const withToken = user => {
     return request(app)
-        .post('/users/signin')
+        .post('/auth/signin')
         .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
         .then(({ body }) => body.token);
 };
 
-xdescribe('users', () => {
+describe('auth routes', () => {
+    const users = Array.apply(null, { length: 1 })
+        .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
+
+    let createdUsers;
+
     const createUser = user => {
         return User.create(user);
     };
-    let token;
 
     beforeEach(() => {
-        return (async() => {
-            await dropCollection('users');
-            await rh.init('users', 1);
-            await Promise.all(rh.users.map(createUser))
-                .then(cs => rh.createdUsers = cs);
-            await withToken(rh.users[0])
-                .then(createdToken => {
-                    token = createdToken;
-                });
-        })();
+        return dropCollection('users');
+    });
+
+    beforeEach(() => {
+        return Promise.all(users.map(createUser))
+            .then(cs => {
+                createdUsers = cs;
+            });
+    });
+
+    let token;
+    beforeEach(() => {
+        return withToken(users[0]).then(createdToken => {
+            token = createdToken;
+        });
     });
 
     it('hashes a users password', () => {
@@ -54,7 +61,7 @@ xdescribe('users', () => {
 
     it('creates a user on signup', () => {
         return request(app)
-            .post('/users/signup')
+            .post('/auth/signup')
             .send({ name: 'ryan', email: 'ryan@ryan.com', clearPassword: 'testing1234' })
             .then(({ body: user }) => {
                 // const user = res.body
@@ -63,11 +70,11 @@ xdescribe('users', () => {
     });
 
     it('compares passwords', () => {
-        const validPassword = rh.users[0].clearPassword;
+        const validPassword = users[0].clearPassword;
         const invalidPassword = `${validPassword}1234`;
 
-        const validCompare = rh.createdUsers[0].compare(validPassword);
-        const invalidCompare = rh.createdUsers[0].compare(invalidPassword);
+        const validCompare = createdUsers[0].compare(validPassword);
+        const invalidCompare = createdUsers[0].compare(invalidPassword);
 
         expect(validCompare).toBeTruthy();
         expect(invalidCompare).toBeFalsy();
@@ -75,10 +82,10 @@ xdescribe('users', () => {
 
     it('signs in a user', () => {
         return request(app)
-            .post('/users/signin')
-            .send({ email: rh.createdUsers[0].email, clearPassword: rh.users[0].clearPassword })
+            .post('/auth/signin')
+            .send({ email: createdUsers[0].email, clearPassword: users[0].clearPassword })
             .then(res => {
-                checkStatus(200)(res);
+                checkOk(res);
 
                 expect(res.body.token).toEqual(expect.any(String));
             });
@@ -86,24 +93,24 @@ xdescribe('users', () => {
 
     it('rejects signing in a bad user', () => {
         return request(app)
-            .post('/users/signin')
-            .send({ email: rh.createdUsers[0].email, clearPassword: `${ rh.users[0].clearPassword}1234` })
+            .post('/auth/signin')
+            .send({ email: createdUsers[0].email, clearPassword: `${users[0].clearPassword}1234` })
             .then(checkStatus(401));
     });
 
     it('rejects signing in a user with bad email', () => {
         return request(app)
-            .post('/users/signin')
+            .post('/auth/signin')
             .set('Authorization', `Bearer ${token}`)
-            .send({ email: `${rh.createdUsers[0].email}`, clearPassword: `${ rh.users[0].clearPassword}1234` })
+            .send({ email: `${createdUsers[0].email}`, clearPassword: `${users[0].clearPassword}1234` })
             .then(checkStatus(401));
     });
 
     it('verifies a signed in user', () => {
-        return withToken(rh.users[0])
+        return withToken(users[0])
             .then(token => {
                 return request(app)
-                    .get('/users/verify')
+                    .get('/auth/verify')
                     .set('Authorization', `Bearer ${token}`)
                     .then(res => {
                         expect(res.body).toEqual({ success: true });
@@ -113,7 +120,7 @@ xdescribe('users', () => {
     });
 
     // it('creates an auth token', () => {
-    //     return rh.createdUsers[0].authToken()
+    //     return createdUsers[0].authToken()
     //         .then(token => {
     //             expect(token).toEqual(expect.any(String));
     //             return token;
