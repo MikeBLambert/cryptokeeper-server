@@ -1,10 +1,8 @@
 const getPrices = require('../../../lib/util/market-api');
 
 describe('market API', () => {
-    it('returns market info for bitcoin', () => {
-        // const BTC = 1;
+    it('returns market info for bitcoin', done => {
         let req = {};
-        //  { body: { coin: `${BTC}` } };
 
         let called = false;
         let error;
@@ -14,10 +12,9 @@ describe('market API', () => {
             
             expect(called).toBeTruthy();
             expect(error).toBeUndefined();
-            expect(req.coinInfo).toEqual('di');
+            expect(req.coinInfo).toEqual(expect.any(Object));
+            done();
         };
         getPrices(req, null, next);
     });
-
-    // it('returns an error if passed')
 });
