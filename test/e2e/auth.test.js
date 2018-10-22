@@ -86,7 +86,6 @@ describe('auth routes', () => {
             .send({ email: createdUsers[0].email, clearPassword: users[0].clearPassword })
             .then(res => {
                 checkOk(res);
-
                 expect(res.body.token).toEqual(expect.any(String));
             });
     });
