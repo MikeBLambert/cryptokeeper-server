@@ -13,7 +13,7 @@ describe('market API', () => {
             
             expect(called).toBeTruthy();
             expect(error).toBeUndefined();
-            expect(req.coinInfo).toEqual('osdfjs');
+            expect(req.coinInfo).toEqual(expect.any(Object));
         };
         getPrices(req, null, next);
     });
