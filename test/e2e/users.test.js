@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../../lib/app');
 
-xdescribe('users', () => {
+describe.skip('users', () => {
 
     it('creates a user', () => {
         const newUser = {

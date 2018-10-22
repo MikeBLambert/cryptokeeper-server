@@ -23,7 +23,10 @@
   },
   "homepage": "https://github.com/DefinitelyNotRobots/cryptomatic#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "chance": "^1.0.16",
     "express": "^4.16.4",
+    "jsonwebtoken": "^8.3.0",
     "mongo": "^0.1.0",
     "mongoose": "^5.3.4"
   },
