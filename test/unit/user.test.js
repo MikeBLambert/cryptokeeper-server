@@ -1,5 +1,5 @@
 const User = require('../../lib/models/User');
-const { getErrors } = require('./helpers');
+const { getErrors } = require('../util/helpers');
 
 describe('User model', () => {
     it('validates a good model', () => {
