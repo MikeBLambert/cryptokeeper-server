@@ -15,4 +15,16 @@ describe('account model', () => {
         const jsonAccount = account.toJSON();
         expect(jsonAccount).toEqual({ ...data, _id: expect.any(Object) });
     });
+
+    it('requires user, currency name, and currency quantity', () => {
+        const data = {
+            currencies: [{ }]
+        };
+
+        const account = new Account(data);
+        const errors = getErrors(account.validateSync(), 2);
+
+        expect(errors.user.properties.message).toEqual('Path `user` is required.');
+        expect(errors['currencies.0.name'].properties.message).toEqual('Path `name` is required.');
+    });
 });

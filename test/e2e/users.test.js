@@ -22,9 +22,7 @@ const withToken = user => {
         .then(({ body }) => body.token);
 };
 
-xdescribe('user routes', () => {
-
-
+xdescribe('users', () => {
     const createUser = user => {
         return User.create(user);
     };
