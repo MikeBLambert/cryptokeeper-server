@@ -51,10 +51,6 @@ describe('account routes', () => {
     it('creates an account for an authorized user', () => {
         account = {
             exchange: 'Fake Market',
-            currencies: [{
-                name: 'BTC',
-                quantity: 4
-            }]
         }
 
         return request(app)
@@ -63,15 +59,12 @@ describe('account routes', () => {
             .send(account)
             .then(res => {
                 checkOk(res);
+                expect(res.body._id).toBeTruthy();
                 expect(res.body).toEqual({
                     _id: expect.any(String),
-                    user: createdUsers[0]._id,
+                    user: createdUsers[0]._id.toString(),
                     exchange: account.exchange,
-                    currencies: [{
-                        _id: expect.any(String),
-                        name: account.currencies[0].name,
-                        quantity: account.currencies[0].quantity
-                    }]
+                    currencies: []
                 });
             });
     });

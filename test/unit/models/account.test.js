@@ -7,10 +7,6 @@ describe('account model', () => {
         const data = {
             user: Types.ObjectId(),
             exchange: 'Fake Market',
-            currencies: [{
-                name: 'BTC',
-                quantity: 5
-            }]
         };
         const account = new Account(data);
         const jsonAccount = account.toJSON();
@@ -18,24 +14,17 @@ describe('account model', () => {
             _id: expect.any(Object) ,
             user: data.user,
             exchange: data.exchange,
-            currencies: [{
-                _id: expect.any(Object),
-                name: data.currencies[0].name,
-                quantity: data.currencies[0].quantity
-            }]
+            currencies: []
         });
     });
 
-    it('requires user, currency name, and currency quantity', () => {
-        const data = {
-            currencies: [{ }]
-        };
+    it('requires user and market', () => {
 
-        const account = new Account(data);
-        const errors = getErrors(account.validateSync(), 3);
+        const account = new Account({});
+        const errors = getErrors(account.validateSync(), 2);
 
         expect(errors.user.properties.message).toEqual('Path `user` is required.');
         expect(errors.exchange.properties.message).toEqual('Path `exchange` is required.');
-        expect(errors['currencies.0.name'].properties.message).toEqual('Path `name` is required.');
+        // expect(errors['currencies.0.name'].properties.message).toEqual('Path `name` is required.');
     });
 });
