@@ -6,7 +6,7 @@ const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
 
-describe('account routes', () => {
+xdescribe('account routes', () => {
     
     const userTemplates = applyUsers(15);
     let createdUsers;
