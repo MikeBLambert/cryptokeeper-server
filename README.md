@@ -3,11 +3,6 @@
 
 ## App requirements:
 
-###
-
-* make ensure-same-user work
-* change path names for routes?
-
 ### Routes
 
 * ~~post /accounts~~
