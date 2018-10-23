@@ -6,7 +6,7 @@ const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
 
-xdescribe('account routes', () => {
+describe('accounts and holdingz', () => {
     
     const userTemplates = applyUsers(15);
     let createdUsers;
@@ -29,7 +29,7 @@ xdescribe('account routes', () => {
         };
 
         await request(app)
-            .post('/accounts')
+            .post('/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account)
             .then(res => {
@@ -54,11 +54,11 @@ xdescribe('account routes', () => {
         };
 
         await request(app)
-            .post('/accounts')
+            .post('/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/accounts/holdings')
+            .post('/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding)
             .then(res => {
@@ -92,15 +92,15 @@ xdescribe('account routes', () => {
         };
 
         await request(app)
-            .post('/accounts')
+            .post('/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/accounts/holdings')
+            .post('/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .put('/accounts/holdings')
+            .put('/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(change)
             .then(res => {
@@ -129,15 +129,15 @@ xdescribe('account routes', () => {
         };
 
         await request(app)
-            .post('/accounts')
+            .post('/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/accounts/holdings')
+            .post('/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .get('/accounts/anyid')
+            .get('/users/accounts/anyid')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -159,7 +159,7 @@ xdescribe('account routes', () => {
 
         await Promise.all(createdTokens.map((token) => {
             return request(app)
-                .post('/accounts')
+                .post('/users/accounts')
                 .set('Authorization', `Bearer ${token}`)
                 .send(account);
         }));
@@ -170,13 +170,13 @@ xdescribe('account routes', () => {
                 quantity: chance.natural()
             };
             return request(app)
-                .post('/accounts/holdings')
+                .post('/users/accounts/holdings')
                 .set('Authorization', `Bearer ${token}`)
                 .send(holding);
         }));
 
         await request(app)
-            .get('/accounts')
+            .get('/leaderboard')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -194,7 +194,7 @@ xdescribe('account routes', () => {
 
         await Promise.all(createdTokens.map((token) => {
             return request(app)
-                .post('/accounts')
+                .post('/users/accounts')
                 .set('Authorization', `Bearer ${token}`)
                 .send(account);
         }));
@@ -205,7 +205,7 @@ xdescribe('account routes', () => {
                 quantity: chance.natural()
             };
             return request(app)
-                .post('/accounts/holdings')
+                .post('/users/accounts/holdings')
                 .set('Authorization', `Bearer ${token}`)
                 .send(holding);
         }))
@@ -218,7 +218,7 @@ xdescribe('account routes', () => {
         // });
 
         await request(app)
-            .get('/accounts')
+            .get('/leaderboard')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -233,3 +233,71 @@ xdescribe('account routes', () => {
             });
     });
 });
+
+describe('transactionz', () => {
+    
+    const users = applyUsers(1);
+    let createdUsers;
+    let createdAccounts;
+    let token;
+
+    beforeEach(async() => {
+        await Promise.all([
+            dropCollection('users'),
+            dropCollection('accounts'),
+            dropCollection('transactions')
+        ]);
+        await Promise.all(users.map(signUp))
+            .then(cs => createdUsers = cs);
+        await signIn(users[0])
+            .then(createdToken => token = createdToken);
+    });
+
+    beforeEach(async() => {
+        let accountData = {
+            user: createdUsers[0]._id,
+            exchange: 'Fake Market',
+        };
+
+        let holdingsData = { name: 'BTC', quantity: 12 };
+
+        await request(app)
+            .post('/users/accounts')
+            .set('Authorization', `Bearer ${token}`)            
+            .send(accountData);
+
+        await request(app)
+            .post('/users/accounts/holdings')
+            .set('Authorization', `Bearer ${token}`)            
+            .send(holdingsData);
+    });
+
+    it('creates a transaction', async() => {
+        
+        let newTransaction = {
+            action: 'buy',
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: chance.natural()
+        };
+
+        await request(app)
+            .post('/users/transactions')
+            .set('Authorization', `Bearer ${token}`)            
+            .send(newTransaction)
+            .then(res => {
+                // checkStatus(200)(res);
+                expect(res.body).toEqual({ 
+                    ...newTransaction,
+                    _id: expect.any(String),
+                    user: createdUsers[0]._id.toString(),
+                    time: expect.any(String)
+                });
+            });
+    });
+
+
+
+});
+
