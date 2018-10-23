@@ -32,6 +32,9 @@ describe('account routes', () => {
     beforeEach(() => {
         return dropCollection('users');
     });
+    beforeEach(() => {
+        return dropCollection('accounts');
+    });
 
     beforeEach(() => {
         return Promise.all(users.map(createUser))
@@ -96,5 +99,53 @@ describe('account routes', () => {
                         });
                     });
             });
+    });
+
+    it('increments the value of a holding', () => {
+
+        const account = {
+            exchange: 'Fake Market',
+        };
+
+        const holding = {
+            name: 'BTC',
+            quantity: 4
+        };
+
+        const change = {
+            name: 'BTC',
+            quantity: 2
+        }
+
+        return request(app)
+            .post('/accounts')
+            .set('Authorization', `Bearer ${token}`)
+            .send(account)
+            .then(() => {
+                request(app)
+                    .post('/accounts/holdings')
+                    .set('Authorization', `Bearer ${token}`)
+                    .send(holding)
+                    .then(() => {
+                        request(app)
+                            .put('/accounts/holdings')
+                            .set('Authorization', `Bearer ${token}`)
+                            .send(holding)
+                            .then(res => {
+                                checkOk(res);
+                                expect(res.body).toEqual({
+                                    _id: expect.any(String),
+                                    user: createdUsers[0]._id.toString(),
+                                    exchange: account.exchange,
+                                    currencies: [{
+                                        name: holding.name,
+                                        quantity: change.quantity
+                                    }]
+                                });
+                            })
+
+                    });
+            });
+
     });
 });
