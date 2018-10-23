@@ -6,7 +6,6 @@ const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
 
-
 const checkStatus = statusCode => res => {
     expect(res.status).toEqual(statusCode);
 };
@@ -54,12 +53,11 @@ describe('account routes', () => {
         };
 
         return request(app)
-            .post(`/accounts/${createdUsers[0]._id}`)
+            .post('/accounts')
             .set('Authorization', `Bearer ${token}`)
             .send(account)
             .then(res => {
                 checkOk(res);
-                expect(res.body._id).toBeTruthy();
                 expect(res.body).toEqual({
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
@@ -69,5 +67,34 @@ describe('account routes', () => {
             });
     });
 
+    it('adds holding for an authorized user', () => {
+        account = {
+            exchange: 'Fake Market',
+        }
 
+        holding = {
+            name: 'BTC',
+            quantity: 4
+        }
+
+        return request(app)
+            .post('/accounts')
+            .set('Authorization', `Bearer ${token}`)
+            .send(account)
+            .then(() => {
+                request(app)
+                    .post('/accounts/holdings')
+                    .set('Authorization', `Bearer ${token}`)
+                    .send(holding)
+                    .then(res => {
+                        checkOk(res);
+                        expect(res.body).toEqual({
+                            _id: expect.any(String),
+                            user: createdUsers[0]._id.toString(),
+                            exchange: account.exchange,
+                            currencies: [holding]
+                        });
+                    });
+            });
+    });
 });
