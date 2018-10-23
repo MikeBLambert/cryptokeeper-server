@@ -137,7 +137,7 @@ describe('account routes', () => {
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .get('/accounts')
+            .get('/accounts/anyid')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -152,7 +152,40 @@ describe('account routes', () => {
     });
 
 
-    it('gets the top 10 accounts by account value', async() => {
+    it('getting the top 10 accounts returns 10 accounts', async() => {
+        const account = {
+            exchange: 'Fake Market',
+        };
+
+        await Promise.all(createdTokens.map((token) => {
+            return request(app)
+                .post('/accounts')
+                .set('Authorization', `Bearer ${token}`)
+                .send(account);
+        }));
+
+        await Promise.all(createdTokens.map((token) => {
+            const holding = {
+                name: 'BTC',
+                quantity: chance.natural()
+            };
+            return request(app)
+                .post('/accounts/holdings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(holding);
+        }));
+
+        await request(app)
+            .get('/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toHaveLength(10);
+
+            });
+    });
+
+    it('getting the top 10 accounts by account value returns the top 10 by market value', async() => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -189,7 +222,6 @@ describe('account routes', () => {
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
-                expect(res.body).toHaveLength(10);
                 // expect(res.body).toEqual({
                 //     _id: expect.any(String),
                 //     user: createdUsers[0]._id.toString(),
