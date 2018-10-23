@@ -13,7 +13,7 @@ describe('exchange API', () => {
             
             expect(called).toBeTruthy();
             expect(error).toBeUndefined();
-            expect(req.coinInfo).toEqual(expect.any(Object));
+            expect(req.marketData).toEqual(expect.any(Object));
             done();
         };
         getPrices(req, null, next);
