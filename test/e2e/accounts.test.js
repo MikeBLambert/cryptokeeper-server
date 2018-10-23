@@ -104,7 +104,7 @@ describe('account routes', () => {
         await request(app)
             .put('/accounts/holdings')
             .set('Authorization', `Bearer ${token}`)
-            .send(holding)
+            .send(change)
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({
@@ -112,8 +112,9 @@ describe('account routes', () => {
                     user: createdUsers[0]._id.toString(),
                     exchange: account.exchange,
                     currencies: [{
+                        _id: expect.any(String),
                         name: holding.name,
-                        quantity: change.quantity
+                        quantity: holding.quantity + change.quantity
                     }]
                 });
             });
