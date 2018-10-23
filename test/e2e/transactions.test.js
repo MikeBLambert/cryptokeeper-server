@@ -19,7 +19,7 @@ const withToken = user => {
         .then(({ body }) => body.token);
 };
 
-describe('account routes', () => {
+describe('transactions routes', () => {
     const users = Array.apply(null, { length: 1 })
         .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
 
@@ -28,6 +28,13 @@ describe('account routes', () => {
     const createUser = user => {
         return User.create(user);
     };
+
+    // const createAccount = account => {
+    //     return request(app)
+    //         .post('/accounts')
+    //         .send(account)
+    //         .then(res => res.body);
+    // };
 
     beforeEach(() => {
         return Promise.all([
@@ -52,14 +59,28 @@ describe('account routes', () => {
         });
     });
 
+    beforeEach(() => {
+        let newAccount = {
+            user: createdUsers[0]._id,
+            exchange: 'Fake Market',
+            currencies: [{
+                name: 'BTC', quantity: 2
+            }]
+        };
+        return request(app)
+            .post('/accounts')
+            .set('Authorization', `Bearer ${token}`)            
+            .send(newAccount);
+    });
+
     it('creates a transaction', () => {
         
         let newTransaction = {
             action: 'buy',
-            currency: 'LTC',
-            market: 'Fake Market',
-            price: 5000,
-            quantity: 12
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: 6500,
+            quantity: 13
         };
 
         return request(app)
@@ -69,7 +90,11 @@ describe('account routes', () => {
             .then(result => {
                 checkOk(result);
                 // expect(result.body).toEqual({ ...newTransaction, user: newTransaction.user.toString(), _id: expect.any(String), time: expect.any(String) });
-                expect(result.body).toEqual({ ...newTransaction, user: expect.any(String), _id: expect.any(String), time: expect.any(String) });
+                expect(result.body).toEqual({ 
+                    _id: expect.any(String), 
+                    user: createdUsers[0]._id,
+                    exchange: 'Fake Market',
+                    currencies:[{ name: 'BTC', quantity: 15 }] });
 
             });
     });
