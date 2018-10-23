@@ -14,21 +14,19 @@ describe('transaction routes', () => {
     let createdUsers;
     let token;
 
-    beforeEach(() => {
-        return (async() => {
-            await Promise.all([
-                dropCollection('users'),
-                dropCollection('accounts'),
-                dropCollection('transactions')
-            ]);
-            await Promise.all(users.map(signUp))
-                .then(cs => createdUsers = cs);
-            await signIn(users[0])
-                .then(createdToken => token = createdToken);
-        })();
+    beforeEach(async() => {
+        await Promise.all([
+            dropCollection('users'),
+            dropCollection('accounts'),
+            dropCollection('transactions')
+        ]);
+        await Promise.all(users.map(signUp))
+            .then(cs => createdUsers = cs);
+        await signIn(users[0])
+            .then(createdToken => token = createdToken);
     });
 
-    beforeEach(() => {
+    beforeEach(async() => {
         let newAccount = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
@@ -36,13 +34,13 @@ describe('transaction routes', () => {
                 name: 'BTC', quantity: 2
             }]
         };
-        return request(app)
+        await request(app)
             .post('/accounts')
             .set('Authorization', `Bearer ${token}`)            
             .send(newAccount);
     });
 
-    it('creates a transaction', () => {
+    it('creates a transaction', async() => {
         
         let newTransaction = {
             action: 'buy',
@@ -52,7 +50,7 @@ describe('transaction routes', () => {
             quantity: chance.natural()
         };
 
-        return request(app)
+        await request(app)
             .post('/transactions')
             .set('Authorization', `Bearer ${token}`)            
             .send(newTransaction)

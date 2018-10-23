@@ -25,12 +25,12 @@ describe('account routes', () => {
         })();
     });
 
-    it('creates an account for an authorized user', () => {
+    it('creates an account for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
 
-        return request(app)
+        await request(app)
             .post('/accounts')
             .set('Authorization', `Bearer ${token}`)
             .send(account)
@@ -45,7 +45,7 @@ describe('account routes', () => {
             });
     });
 
-    it('adds holding for an authorized user', () => {
+    it('adds holding for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -55,31 +55,29 @@ describe('account routes', () => {
             quantity: chance.natural()
         };
 
-        return (async() => {
-            await request(app)
-                .post('/accounts')
-                .set('Authorization', `Bearer ${token}`)
-                .send(account);
-            await request(app)
-                .post('/accounts/holdings')
-                .set('Authorization', `Bearer ${token}`)
-                .send(holding)
-                .then(res => {
-                    checkStatus(200)(res);
-                    expect(res.body).toEqual({
-                        _id: expect.any(String),
-                        user: createdUsers[0]._id.toString(),
-                        exchange: account.exchange,
-                        currencies: [{
-                            ...holding,
-                            _id: expect.any(String)
-                        }]
-                    });
+        await request(app)
+            .post('/accounts')
+            .set('Authorization', `Bearer ${token}`)
+            .send(account);
+        await request(app)
+            .post('/accounts/holdings')
+            .set('Authorization', `Bearer ${token}`)
+            .send(holding)
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toEqual({
+                    _id: expect.any(String),
+                    user: createdUsers[0]._id.toString(),
+                    exchange: account.exchange,
+                    currencies: [{
+                        ...holding,
+                        _id: expect.any(String)
+                    }]
                 });
-        })();
+            });
     });
 
-    it('increments the value of a holding', () => {
+    it('increments the value of a holding', async() => {
 
         const account = {
             exchange: 'Fake Market',
@@ -95,33 +93,29 @@ describe('account routes', () => {
             quantity: 2
         };
 
-        return (async() => {
-            await request(app)
-                .post('/accounts')
-                .set('Authorization', `Bearer ${token}`)
-                .send(account);
-            await request(app)
-                .post('/accounts/holdings')
-                .set('Authorization', `Bearer ${token}`)
-                .send(holding);
-            await request(app)
-                .put('/accounts/holdings')
-                .set('Authorization', `Bearer ${token}`)
-                .send(holding)
-                .then(res => {
-                    checkStatus(200)(res);
-                    expect(res.body).toEqual({
-                        _id: expect.any(String),
-                        user: createdUsers[0]._id.toString(),
-                        exchange: account.exchange,
-                        currencies: [{
-                            name: holding.name,
-                            quantity: change.quantity
-                        }]
-                    });
+        await request(app)
+            .post('/accounts')
+            .set('Authorization', `Bearer ${token}`)
+            .send(account);
+        await request(app)
+            .post('/accounts/holdings')
+            .set('Authorization', `Bearer ${token}`)
+            .send(holding);
+        await request(app)
+            .put('/accounts/holdings')
+            .set('Authorization', `Bearer ${token}`)
+            .send(holding)
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toEqual({
+                    _id: expect.any(String),
+                    user: createdUsers[0]._id.toString(),
+                    exchange: account.exchange,
+                    currencies: [{
+                        name: holding.name,
+                        quantity: change.quantity
+                    }]
                 });
-            
-        })();
-
+            });
     });
 });
