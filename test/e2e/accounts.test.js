@@ -12,17 +12,15 @@ describe('account routes', () => {
     let createdUsers;
     let token;
 
-    beforeEach(() => {
-        return (async() => {
-            await Promise.all([
-                dropCollection('users'), 
-                dropCollection('accounts'),
-            ]);
-            await Promise.all(users.map(signUp))
-                .then(cs => createdUsers = cs);
-            await signIn(users[0])
-                .then(createdToken => token = createdToken);
-        })();
+    beforeEach(async() => {
+        await Promise.all([
+            dropCollection('users'), 
+            dropCollection('accounts'),
+        ]);
+        await Promise.all(users.map(signUp))
+            .then(cs => createdUsers = cs);
+        await signIn(users[0])
+            .then(createdToken => token = createdToken);
     });
 
     it('creates an account for an authorized user', async() => {

@@ -11,7 +11,7 @@ describe('account model', () => {
         const account = new Account(data);
         const jsonAccount = account.toJSON();
         expect(jsonAccount).toEqual({ 
-            _id: expect.any(Object) ,
+            _id: expect.any(Object),
             user: data.user,
             exchange: data.exchange,
             currencies: []

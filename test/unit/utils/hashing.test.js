@@ -3,7 +3,6 @@ const { hash, compare } = require('../../../lib/util/hashing');
 describe('password hasher', () => {
     it('hash a password', () => {
         const hashedPassword = hash('abcd');
-        console.log(hashedPassword);
         expect(hashedPassword).not.toEqual('abcd');
     });
 
