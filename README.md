@@ -13,7 +13,7 @@
 * ~~post /accounts~~
 * ~~post /accounts/holdings~~
 * ~~put /accounts/holdings~~
-* post /transactions
+* ~~post /transactions~~
     * all transactions should modify account holdings
 * ~~get /accounts by id~~
 * get /accounts for top 10 value
