@@ -1,5 +1,17 @@
 # Cryptokeeper
 
+## Tasks
+
+1. finish 'get top 10'
+1. do 'get transactions for user'
+1. get data showing up on the front end
+1. deploy to heroku
+1. complete view componenets
+1. fix contingency logic in put transactions
+1. add more exchanges
+1. add more coins
+1. make stuff fancier
+1. add a bot
 
 ## App requirements:
 
@@ -9,7 +21,6 @@
 * ~~post /accounts/holdings~~
 * ~~put /accounts/holdings~~
 * ~~post /transactions~~
-    * all transactions should modify account holdings
 * ~~get /accounts by id~~
 * get /accounts for top 10 value
 * get /transactions for user id
