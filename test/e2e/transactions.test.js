@@ -5,60 +5,29 @@ const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
+const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
-const checkStatus = statusCode => res => {
-    expect(res.status).toEqual(statusCode);
-};
 
-const checkOk = res => checkStatus(200)(res);
-
-const withToken = user => {
-    return request(app)
-        .post('/auth/signin')
-        .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
-        .then(({ body }) => body.token);
-};
+const users = applyUsers();
 
 
 describe('transaction routes', () => {
-    
-    beforeEach(() => {
-        return Promise.all([
-            dropCollection('users'),
-            dropCollection('transactions')
-        ]
-        );
-    });
-    
-    const users = Array.apply(null, { length: 1 })
-        .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
-
+        
     let createdUsers;
-
-    const createUser = user => {
-        return User.create(user);
-    };
-
-    // const createAccount = account => {
-    //     return request(app)
-    //         .post('/accounts')
-    //         .send(account)
-    //         .then(res => res.body);
-    // };
-
-    beforeEach(() => {
-        return Promise.all(users.map(createUser))
-            .then(cs => {
-                createdUsers = cs;
-            });
-    });
-
     let token;
-    
+
     beforeEach(() => {
-        return withToken(users[0]).then(createdToken => {
-            token = createdToken;
-        });
+        return (async () => {
+            await Promise.all([
+                dropCollection('users'),
+                dropCollection('accounts'),
+                dropCollection('transactions')
+            ]);
+            await Promise.all(users.map(signUp))
+                .then(cs => createdUsers = cs);
+            await signIn(users[0])
+                .then(createdToken => token = createdToken);
+        })();
     });
 
     beforeEach(() => {
@@ -89,9 +58,9 @@ describe('transaction routes', () => {
             .post('/transactions')
             .set('Authorization', `Bearer ${token}`)            
             .send(newTransaction)
-            .then(result => {
-                checkOk(result);
-                expect(result.body).toEqual({ 
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toEqual({ 
                     ...newTransaction,
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),

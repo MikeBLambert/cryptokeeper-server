@@ -15,7 +15,10 @@ describe('account routes', () => {
 
     beforeEach(() => {
         return (async() => {
-            await Promise.all([dropCollection('users'), dropCollection('accounts')]);
+            await Promise.all([
+                dropCollection('users'), 
+                dropCollection('accounts'),
+            ]);
             await Promise.all(users.map(signUp))
                 .then(cs => createdUsers = cs);
             await signIn(users[0])
