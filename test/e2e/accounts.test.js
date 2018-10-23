@@ -4,8 +4,11 @@ const app = require('../../lib/app');
 const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
-const { checkStatus } = require('../util/helpers');
+// const { checkStatus } = require('../util/helpers');
 
+const checkStatus = statusCode => res => {
+    expect(res.status).toEqual(statusCode);
+};
 
 // const users = Array.apply(null, { length: 1 })
 //     .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));

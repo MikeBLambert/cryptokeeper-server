@@ -91,12 +91,12 @@ describe('transaction routes', () => {
             .send(newTransaction)
             .then(result => {
                 checkOk(result);
-                // expect(result.body).toEqual({ ...newTransaction, user: newTransaction.user.toString(), _id: expect.any(String), time: expect.any(String) });
                 expect(result.body).toEqual({ 
-                    _id: expect.any(String), 
-                    user: createdUsers[0]._id,
-                    exchange: 'Fake Market',
-                    currencies:[{ name: 'BTC', quantity: 15 }] });
+                    ...newTransaction,
+                    _id: expect.any(String),
+                    user: createdUsers[0]._id.toString(),
+                    time: expect.any(String)
+                });
 
             });
     });
