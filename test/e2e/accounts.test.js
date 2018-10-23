@@ -2,18 +2,40 @@ const { dropCollection } = require('../util/db');
 const User = require('../../lib/models/User');
 const app = require('../../lib/app');
 const request = require('supertest');
-const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus } = require('../util/helpers');
 
 
-const users = Array.apply(null, { length: 1 })
-    .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
+// const users = Array.apply(null, { length: 1 })
+//     .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
 
-const signUp = user => User.create(user);
+// const signUp = user => User.create(user);
 
-const signIn = user => {
+// const signIn = user => {
+//     return request(app)
+//         .post('/auth/signin')
+//         .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
+//         .then(({ body }) => body.token);
+// };
+
+// describe('account routes', () => {
+    
+//     let createdUsers;
+//     let token;
+
+//     beforeEach(() => {
+//         return (async() => {
+//             await Promise.all([dropCollection('users'), dropCollection('accounts')]);
+//             await Promise.all(users.map(signUp))
+//                 .then(cs => createdUsers = cs);
+//             await signIn(users[0])
+//                 .then(createdToken => token = createdToken);
+//         })();
+//     });
+
+
+const withToken = user => {
     return request(app)
         .post('/auth/signin')
         .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
@@ -21,18 +43,31 @@ const signIn = user => {
 };
 
 describe('account routes', () => {
-    
+    const users = Array.apply(null, { length: 1 })
+        .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
+
     let createdUsers;
-    let token;
+
+    const createUser = user => {
+        return User.create(user);
+    };
 
     beforeEach(() => {
-        return (async () => {
-            await Promise.all([dropCollection('users'), dropCollection('accounts')]);
-            await Promise.all(users.map(signUp))
-                .then(cs => createdUsers = cs);
-            await signIn(users[0])
-                .then(createdToken => token = createdToken);
-        })();
+        return dropCollection('users');
+    });
+
+    beforeEach(() => {
+        return Promise.all(users.map(createUser))
+            .then(cs => {
+                createdUsers = cs;
+            });
+    });
+
+    let token;
+    beforeEach(() => {
+        return withToken(users[0]).then(createdToken => {
+            token = createdToken;
+        });
     });
 
     it('creates an account for an authorized user', () => {
@@ -56,20 +91,20 @@ describe('account routes', () => {
     });
 
     it('adds holding for an authorized user', () => {
-        account = {
+        const account = {
             exchange: 'Fake Market',
-        }
+        };
 
-        holding = {
+        const holding = {
             name: 'BTC',
             quantity: 4
-        }
+        };
 
-        return (async () => {
+        return (async() => {
             await request(app)
                 .post('/accounts')
                 .set('Authorization', `Bearer ${token}`)
-                .send(account)
+                .send(account);
             await request(app)
                 .post('/accounts/holdings')
                 .set('Authorization', `Bearer ${token}`)
@@ -100,9 +135,9 @@ describe('account routes', () => {
         const change = {
             name: 'BTC',
             quantity: 2
-        }
+        };
 
-        return (async () => {
+        return (async() => {
             await request(app)
                 .post('/accounts')
                 .set('Authorization', `Bearer ${token}`)
@@ -126,7 +161,7 @@ describe('account routes', () => {
                             quantity: change.quantity
                         }]
                     });
-                })
+                });
             
         })();
 

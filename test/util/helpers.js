@@ -1,6 +1,8 @@
 const User = require('../../lib/models/User');
 const request = require('supertest');
 const app = require('../../lib/app');
+const Chance = require('chance');
+const chance = new Chance();
 
 
 const getErrors = (validation, numberExpected) => {
@@ -17,7 +19,7 @@ const checkStatus = statusCode => res => {
 const applyUsers = function() {
     return Array.apply(null, { length: 1 })
         .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
-} 
+};
 
 const signUp = user => User.create(user);
 
