@@ -19,7 +19,17 @@ const withToken = user => {
         .then(({ body }) => body.token);
 };
 
-describe('transactions routes', () => {
+
+describe('transaction routes', () => {
+    
+    beforeEach(() => {
+        return Promise.all([
+            dropCollection('users'),
+            dropCollection('transactions')
+        ]
+        );
+    });
+    
     const users = Array.apply(null, { length: 1 })
         .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
 
@@ -35,14 +45,6 @@ describe('transactions routes', () => {
     //         .send(account)
     //         .then(res => res.body);
     // };
-
-    beforeEach(() => {
-        return Promise.all([
-            dropCollection('users'),
-            dropCollection('transactions')
-        ]
-        );
-    });
 
     beforeEach(() => {
         return Promise.all(users.map(createUser))

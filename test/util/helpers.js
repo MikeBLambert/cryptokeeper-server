@@ -1,8 +1,31 @@
+const User = require('../../lib/models/User');
+const request = require('supertest');
+const app = require('../../lib/app');
+
+
 const getErrors = (validation, numberExpected) => {
     expect(validation).toBeDefined();
     const errors = validation.errors;
     expect(Object.keys(errors)).toHaveLength(numberExpected);
     return errors;
+};
+
+const checkStatus = statusCode => res => {
+    expect(res.status).toEqual(statusCode);
+};
+
+const applyUsers = function() {
+    return Array.apply(null, { length: 1 })
+        .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
+} 
+
+const signUp = user => User.create(user);
+
+const signIn = user => {
+    return request(app)
+        .post('/auth/signin')
+        .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
+        .then(({ body }) => body.token);
 };
 
 class ResourceHelper {
@@ -28,7 +51,6 @@ class ResourceHelper {
 
     task(resource, data) {
         const routes = {
-
             users: '/users'
         };
         const route = routes[resource];
@@ -57,5 +79,9 @@ class ResourceHelper {
 
 module.exports = {
     getErrors,
+    checkStatus,
+    applyUsers,
+    signUp,
+    signIn,
     ResourceHelper
 };
