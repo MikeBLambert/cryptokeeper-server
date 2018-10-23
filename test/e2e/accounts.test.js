@@ -147,7 +147,6 @@ describe('account routes', () => {
                     exchange: account.exchange,
                     currencies: [{
                         ...holding,
-                        _id: expect.any(String)
                     }]
                 });
             });
