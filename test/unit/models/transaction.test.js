@@ -8,7 +8,7 @@ describe('transaction model', () => {
             user: Types.ObjectId(),
             action: 'sell',
             currency: 'BTC',
-            market: 'Fake Market',
+            exchange: 'Fake Market',
             price: 5,
             quantity: 6
         };
@@ -17,7 +17,7 @@ describe('transaction model', () => {
         expect(jsonTransaction).toEqual({ ...data, time: expect.any(Date), _id: expect.any(Object) });
     });
 
-    it('requires user, action, currency, market, price, and quantity', () => {
+    it('requires user, action, currency, exchange, price, and quantity', () => {
         const data = {
             
         };
@@ -28,7 +28,7 @@ describe('transaction model', () => {
         expect(errors.user.properties.message).toEqual('Path `user` is required.');
         expect(errors.action.properties.message).toEqual('Path `action` is required.');        
         expect(errors.currency.properties.message).toEqual('Path `currency` is required.');
-        expect(errors.market.properties.message).toEqual('Path `market` is required.');
+        expect(errors.exchange.properties.message).toEqual('Path `exchange` is required.');
         expect(errors.price.properties.message).toEqual('Path `price` is required.');
         expect(errors.quantity.properties.message).toEqual('Path `quantity` is required.');
     });
