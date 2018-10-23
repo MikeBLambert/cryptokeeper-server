@@ -55,7 +55,6 @@ describe('account routes', () => {
     it('creates a transaction', () => {
         
         let newTransaction = {
-            user: createdUsers[0]._id,            
             action: 'buy',
             currency: 'LTC',
             market: 'Fake Market',
@@ -68,7 +67,10 @@ describe('account routes', () => {
             .set('Authorization', `Bearer ${token}`)            
             .send(newTransaction)
             .then(result => {
-                expect(result.body).toEqual({ ...newTransaction, user: newTransaction.user.toString(), _id: expect.any(String), time: expect.any(String) });
+                checkOk(result);
+                // expect(result.body).toEqual({ ...newTransaction, user: newTransaction.user.toString(), _id: expect.any(String), time: expect.any(String) });
+                expect(result.body).toEqual({ ...newTransaction, user: expect.any(String), _id: expect.any(String), time: expect.any(String) });
+
             });
     });
 
