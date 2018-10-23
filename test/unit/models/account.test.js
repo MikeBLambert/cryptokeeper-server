@@ -6,7 +6,7 @@ describe('account model', () => {
     it('validates a good model', () => {
         const data = {
             user: Types.ObjectId(),
-            exchange: 'Fake Market',
+            exchange: 'Fake Market'
         };
         const account = new Account(data);
         const jsonAccount = account.toJSON();
@@ -25,6 +25,5 @@ describe('account model', () => {
 
         expect(errors.user.properties.message).toEqual('Path `user` is required.');
         expect(errors.exchange.properties.message).toEqual('Path `exchange` is required.');
-        // expect(errors['currencies.0.name'].properties.message).toEqual('Path `name` is required.');
     });
 });

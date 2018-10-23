@@ -5,14 +5,14 @@
 
 ### Routes
 
-* post /accounts
-* post /accounts/holdings
-* put /accounts/holdings
+* ~~post /accounts~~
+* ~~post /accounts/holdings~~
+* ~~put /accounts/holdings~~
 * post /transactions
     * all transactions should modify account holdings
 * get /accounts by id
-* get /transactions for user id
 * get /accounts for top 10 value
+* get /transactions for user id
 
 ### Business logic requirements
 
