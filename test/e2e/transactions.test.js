@@ -7,7 +7,7 @@ const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
 
-const users = applyUsers();
+const users = applyUsers(1);
 
 
 describe('transaction routes', () => {
