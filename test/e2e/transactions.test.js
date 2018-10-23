@@ -19,7 +19,7 @@ const withToken = user => {
         .then(({ body }) => body.token);
 };
 
-describe('account routes', () => {
+describe('transaction routes', () => {
     
     beforeEach(() => {
         return Promise.all([

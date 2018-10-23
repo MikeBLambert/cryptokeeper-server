@@ -5,35 +5,22 @@ const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
+const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
 
-const users = Array.apply(null, { length: 1 })
-    .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
-
-const createUser = user => User.create(user);
-
-const withToken = user => {
-    return request(app)
-        .post('/auth/signin')
-        .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
-        .then(({ body }) => body.token);
-};
-
-const checkStatus = statusCode => res => {
-    expect(res.status).toEqual(statusCode);
-};
 
 describe('account routes', () => {
     
+    const users = applyUsers();
     let createdUsers;
     let token;
 
     beforeEach(() => {
         return (async () => {
             await Promise.all([dropCollection('users'), dropCollection('accounts')]);
-            await Promise.all(users.map(createUser))
+            await Promise.all(users.map(signUp))
                 .then(cs => createdUsers = cs);
-            await withToken(users[0])
+            await signIn(users[0])
                 .then(createdToken => token = createdToken);
         })();
     });
