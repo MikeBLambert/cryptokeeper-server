@@ -1,5 +1,4 @@
 const { dropCollection } = require('../util/db');
-const User = require('../../lib/models/User');
 const app = require('../../lib/app');
 const request = require('supertest');
 const Chance = require('chance');
@@ -53,7 +52,7 @@ describe('account routes', () => {
 
         const holding = {
             name: 'BTC',
-            quantity: 4
+            quantity: chance.natural()
         };
 
         return (async() => {

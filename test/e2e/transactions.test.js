@@ -1,8 +1,6 @@
 const { dropCollection } = require('../util/db');
-const User = require('../../lib/models/User');
 const app = require('../../lib/app');
 const request = require('supertest');
-const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
@@ -17,7 +15,7 @@ describe('transaction routes', () => {
     let token;
 
     beforeEach(() => {
-        return (async () => {
+        return (async() => {
             await Promise.all([
                 dropCollection('users'),
                 dropCollection('accounts'),
@@ -50,8 +48,8 @@ describe('transaction routes', () => {
             action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
-            price: 6500,
-            quantity: 13
+            price: chance.natural(),
+            quantity: chance.natural()
         };
 
         return request(app)
