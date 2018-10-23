@@ -20,6 +20,15 @@ const withToken = user => {
 };
 
 describe('account routes', () => {
+    
+    beforeEach(() => {
+        return Promise.all([
+            dropCollection('users'),
+            dropCollection('transactions')
+        ]
+        );
+    });
+    
     const users = Array.apply(null, { length: 1 })
         .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
 
@@ -28,14 +37,6 @@ describe('account routes', () => {
     const createUser = user => {
         return User.create(user);
     };
-
-    beforeEach(() => {
-        return Promise.all([
-            dropCollection('users'),
-            dropCollection('transactions')
-        ]
-        );
-    });
 
     beforeEach(() => {
         return Promise.all(users.map(createUser))
