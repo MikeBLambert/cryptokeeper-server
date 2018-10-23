@@ -30,7 +30,11 @@ describe('account routes', () => {
     };
 
     beforeEach(() => {
-        return dropCollection('users');
+        return Promise.all([
+            dropCollection('users'),
+            dropCollection('transactions')
+        ]
+        );
     });
 
     beforeEach(() => {
@@ -51,7 +55,7 @@ describe('account routes', () => {
     it('creates a transaction', () => {
         
         let newTransaction = {
-            user: createdUsers[0]._id,
+            user: createdUsers[0]._id,            
             action: 'buy',
             currency: 'LTC',
             market: 'Fake Market',
@@ -61,9 +65,10 @@ describe('account routes', () => {
 
         return request(app)
             .post('/transactions')
+            .set('Authorization', `Bearer ${token}`)            
             .send(newTransaction)
             .then(result => {
-                expect(result.body).toEqual('lskdjf');
+                expect(result.body).toEqual({ ...newTransaction, user: newTransaction.user.toString(), _id: expect.any(String), time: expect.any(String) });
             });
     });
 

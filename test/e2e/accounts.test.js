@@ -49,9 +49,9 @@ describe('account routes', () => {
     });
 
     it('creates an account for an authorized user', () => {
-        account = {
+        const account = {
             exchange: 'Fake Market',
-        }
+        };
 
         return request(app)
             .post(`/accounts/${createdUsers[0]._id}`)
