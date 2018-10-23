@@ -53,7 +53,7 @@ describe('account routes', () => {
         }
 
         return request(app)
-            .post(`/accounts/${createdUsers[0]._id}`)
+            .post('/accounts')
             .set('Authorization', `Bearer ${token}`)
             .send(account)
             .then(res => {
@@ -78,12 +78,12 @@ describe('account routes', () => {
         }
 
         return request(app)
-            .post(`/accounts/${createdUsers[0]._id}`)
+            .post('/accounts')
             .set('Authorization', `Bearer ${token}`)
             .send(account)
             .then(() => {
                 request(app)
-                    .post(`/accounts/${createdUsers[0]._id}/holdings`)
+                    .post('/accounts/holdings')
                     .set('Authorization', `Bearer ${token}`)
                     .send(holding)
                     .then(res => {
