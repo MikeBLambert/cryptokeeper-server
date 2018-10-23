@@ -16,8 +16,8 @@ const checkStatus = statusCode => res => {
     expect(res.status).toEqual(statusCode);
 };
 
-const applyUsers = function() {
-    return Array.apply(null, { length: 1 })
+const applyUsers = function(length) {
+    return Array.apply(null, { length: length })
         .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
 };
 

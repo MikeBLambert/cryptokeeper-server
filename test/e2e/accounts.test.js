@@ -5,22 +5,22 @@ const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
-const users = applyUsers();
 
 describe('account routes', () => {
     
+    const userTemplates = applyUsers(15);
     let createdUsers;
-    let token;
+    let createdTokens;
 
     beforeEach(async() => {
         await Promise.all([
             dropCollection('users'), 
             dropCollection('accounts'),
         ]);
-        await Promise.all(users.map(signUp))
+        await Promise.all(userTemplates.map(signUp))
             .then(cs => createdUsers = cs);
-        await signIn(users[0])
-            .then(createdToken => token = createdToken);
+        await Promise.all(userTemplates.map(signIn))
+            .then(cs => createdTokens = cs);
     });
 
     it('creates an account for an authorized user', async() => {
@@ -30,7 +30,7 @@ describe('account routes', () => {
 
         await request(app)
             .post('/accounts')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account)
             .then(res => {
                 checkStatus(200)(res);
@@ -55,11 +55,11 @@ describe('account routes', () => {
 
         await request(app)
             .post('/accounts')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
             .post('/accounts/holdings')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding)
             .then(res => {
                 checkStatus(200)(res);
@@ -93,15 +93,15 @@ describe('account routes', () => {
 
         await request(app)
             .post('/accounts')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
             .post('/accounts/holdings')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
             .put('/accounts/holdings')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(change)
             .then(res => {
                 checkStatus(200)(res);
@@ -130,25 +130,74 @@ describe('account routes', () => {
 
         await request(app)
             .post('/accounts')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
             .post('/accounts/holdings')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
             .get('/accounts')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({
-                    _id: expect.any(String),
-                    user: createdUsers[0]._id.toString(),
+
                     exchange: account.exchange,
                     currencies: [{
                         ...holding,
                     }]
                 });
+            });
+    });
+
+
+    it('gets the top 10 accounts by account value', async() => {
+        const account = {
+            exchange: 'Fake Market',
+        };
+
+        let createdAccounts;
+
+        await Promise.all(createdTokens.map((token) => {
+            return request(app)
+                .post('/accounts')
+                .set('Authorization', `Bearer ${token}`)
+                .send(account);
+        }));
+
+        await Promise.all(createdTokens.map((token) => {
+            const holding = {
+                name: 'BTC',
+                quantity: chance.natural()
+            };
+            return request(app)
+                .post('/accounts/holdings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(holding);
+        }))
+            .then(cs => createdAccounts = cs);
+
+        // set variable here that calls in middleware/util that defines current market value of an account:
+
+        // const topTen = createdAccounts.sort((a, b) => {
+        //     // a.reduce
+        // });
+
+        await request(app)
+            .get('/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toHaveLength(10);
+                // expect(res.body).toEqual({
+                //     _id: expect.any(String),
+                //     user: createdUsers[0]._id.toString(),
+                //     exchange: account.exchange,
+                //     currencies: [{
+                //         ...holding,
+                //     }]
+                // });
             });
     });
 });
