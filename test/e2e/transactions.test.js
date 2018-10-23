@@ -1,5 +1,6 @@
 const { dropCollection } = require('../util/db');
 const app = require('../../lib/app');
+const Account = require('../../lib/models/Account');
 const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
@@ -12,6 +13,7 @@ const users = applyUsers();
 describe('transaction routes', () => {
         
     let createdUsers;
+    let createdAccounts;
     let token;
 
     beforeEach(async() => {
@@ -27,14 +29,22 @@ describe('transaction routes', () => {
     });
 
     beforeEach(async() => {
-        let newAccount = {
+        let accountData = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
         };
+
+        let holdingsData = { name: 'BTC', quantity: 12 };
+
         await request(app)
             .post('/accounts')
             .set('Authorization', `Bearer ${token}`)            
-            .send(newAccount);
+            .send(accountData);
+
+        await request(app)
+            .post('/accounts/holdings')
+            .set('Authorization', `Bearer ${token}`)            
+            .send(holdingsData);
     });
 
     it('creates a transaction', async() => {
@@ -52,14 +62,13 @@ describe('transaction routes', () => {
             .set('Authorization', `Bearer ${token}`)            
             .send(newTransaction)
             .then(res => {
-                checkStatus(200)(res);
+                // checkStatus(200)(res);
                 expect(res.body).toEqual({ 
                     ...newTransaction,
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
                     time: expect.any(String)
                 });
-
             });
     });
 
