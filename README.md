@@ -3,6 +3,10 @@
 
 ## App requirements:
 
+###
+
+* make ensure-same-user work
+
 ### Routes
 
 * ~~post /accounts~~

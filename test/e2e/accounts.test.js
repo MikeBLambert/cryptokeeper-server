@@ -117,4 +117,39 @@ describe('account routes', () => {
                 });
             });
     });
+
+    it('gets an account for an authorized user', async() => {
+        const account = {
+            exchange: 'Fake Market',
+        };
+
+        const holding = {
+            name: 'BTC',
+            quantity: chance.natural()
+        };
+
+        await request(app)
+            .post('/accounts')
+            .set('Authorization', `Bearer ${token}`)
+            .send(account);
+        await request(app)
+            .post('/accounts/holdings')
+            .set('Authorization', `Bearer ${token}`)
+            .send(holding);
+        await request(app)
+            .get('/accounts')
+            .set('Authorization', `Bearer ${token}`)
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toEqual({
+                    _id: expect.any(String),
+                    user: createdUsers[0]._id.toString(),
+                    exchange: account.exchange,
+                    currencies: [{
+                        ...holding,
+                        _id: expect.any(String)
+                    }]
+                });
+            });
+    });
 });
