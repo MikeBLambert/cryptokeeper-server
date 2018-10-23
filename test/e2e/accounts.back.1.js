@@ -5,23 +5,12 @@ const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
-const { checkStatus } = require('../util/helpers');
+const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
-
-const users = Array.apply(null, { length: 1 })
-    .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
-
-const signUp = user => User.create(user);
-
-const signIn = user => {
-    return request(app)
-        .post('/auth/signin')
-        .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
-        .then(({ body }) => body.token);
-};
 
 describe('account routes', () => {
     
+    const users = applyUsers();
     let createdUsers;
     let token;
 
