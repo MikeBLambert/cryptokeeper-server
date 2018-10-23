@@ -6,11 +6,11 @@ const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
 
-const checkStatus = statusCode => res => {
-    expect(res.status).toEqual(statusCode);
-};
 
-const checkOk = res => checkStatus(200)(res);
+const users = Array.apply(null, { length: 1 })
+    .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
+
+const createUser = user => User.create(user);
 
 const withToken = user => {
     return request(app)
@@ -19,35 +19,23 @@ const withToken = user => {
         .then(({ body }) => body.token);
 };
 
+const checkStatus = statusCode => res => {
+    expect(res.status).toEqual(statusCode);
+};
+
 describe('account routes', () => {
-    const users = Array.apply(null, { length: 1 })
-        .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
-
+    
     let createdUsers;
-
-    const createUser = user => {
-        return User.create(user);
-    };
-
-    beforeEach(() => {
-        return dropCollection('users');
-    });
-    beforeEach(() => {
-        return dropCollection('accounts');
-    });
-
-    beforeEach(() => {
-        return Promise.all(users.map(createUser))
-            .then(cs => {
-                createdUsers = cs;
-            });
-    });
-
     let token;
+
     beforeEach(() => {
-        return withToken(users[0]).then(createdToken => {
-            token = createdToken;
-        });
+        return (async () => {
+            await Promise.all([dropCollection('users'), dropCollection('accounts')]);
+            await Promise.all(users.map(createUser))
+                .then(cs => createdUsers = cs);
+            await withToken(users[0])
+                .then(createdToken => token = createdToken);
+        })();
     });
 
     it('creates an account for an authorized user', () => {
@@ -60,7 +48,7 @@ describe('account routes', () => {
             .set('Authorization', `Bearer ${token}`)
             .send(account)
             .then(res => {
-                checkOk(res);
+                checkStatus(200)(res);
                 expect(res.body).toEqual({
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
@@ -80,25 +68,25 @@ describe('account routes', () => {
             quantity: 4
         }
 
-        return request(app)
-            .post('/accounts')
-            .set('Authorization', `Bearer ${token}`)
-            .send(account)
-            .then(() => {
-                request(app)
-                    .post('/accounts/holdings')
-                    .set('Authorization', `Bearer ${token}`)
-                    .send(holding)
-                    .then(res => {
-                        checkOk(res);
-                        expect(res.body).toEqual({
-                            _id: expect.any(String),
-                            user: createdUsers[0]._id.toString(),
-                            exchange: account.exchange,
-                            currencies: [holding]
-                        });
+        return (async () => {
+            await request(app)
+                .post('/accounts')
+                .set('Authorization', `Bearer ${token}`)
+                .send(account)
+            await request(app)
+                .post('/accounts/holdings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(holding)
+                .then(res => {
+                    checkStatus(200)(res);
+                    expect(res.body).toEqual({
+                        _id: expect.any(String),
+                        user: createdUsers[0]._id.toString(),
+                        exchange: account.exchange,
+                        currencies: [holding]
                     });
-            });
+                });
+        })();
     });
 
     it('increments the value of a holding', () => {
@@ -117,35 +105,33 @@ describe('account routes', () => {
             quantity: 2
         }
 
-        return request(app)
-            .post('/accounts')
-            .set('Authorization', `Bearer ${token}`)
-            .send(account)
-            .then(() => {
-                request(app)
-                    .post('/accounts/holdings')
-                    .set('Authorization', `Bearer ${token}`)
-                    .send(holding)
-                    .then(() => {
-                        request(app)
-                            .put('/accounts/holdings')
-                            .set('Authorization', `Bearer ${token}`)
-                            .send(holding)
-                            .then(res => {
-                                checkOk(res);
-                                expect(res.body).toEqual({
-                                    _id: expect.any(String),
-                                    user: createdUsers[0]._id.toString(),
-                                    exchange: account.exchange,
-                                    currencies: [{
-                                        name: holding.name,
-                                        quantity: change.quantity
-                                    }]
-                                });
-                            })
-
+        return (async () => {
+            await request(app)
+                .post('/accounts')
+                .set('Authorization', `Bearer ${token}`)
+                .send(account);
+            await request(app)
+                .post('/accounts/holdings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(holding);
+            await request(app)
+                .put('/accounts/holdings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(holding)
+                .then(res => {
+                    checkStatus(200)(res);
+                    expect(res.body).toEqual({
+                        _id: expect.any(String),
+                        user: createdUsers[0]._id.toString(),
+                        exchange: account.exchange,
+                        currencies: [{
+                            name: holding.name,
+                            quantity: change.quantity
+                        }]
                     });
-            });
+                })
+            
+        })();
 
     });
 });
