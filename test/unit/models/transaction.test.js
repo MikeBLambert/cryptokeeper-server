@@ -1,5 +1,5 @@
 const Transaction = require('../../../lib/models/Transaction');
-// const { getErrors } = require('../../util/helpers');
+const { getErrors } = require('../../util/helpers');
 const { Types } = require('mongoose');
 
 describe('transaction model', () => {
@@ -15,5 +15,21 @@ describe('transaction model', () => {
         const transaction = new Transaction(data);
         const jsonTransaction = transaction.toJSON();
         expect(jsonTransaction).toEqual({ ...data, time: expect.any(Date), _id: expect.any(Object) });
+    });
+
+    it('requires user, action, currency, market, price, and quantity', () => {
+        const data = {
+            
+        };
+
+        const transaction = new Transaction(data);
+        const errors = getErrors(transaction.validateSync(), 6);
+
+        expect(errors.user.properties.message).toEqual('Path `user` is required.');
+        expect(errors.action.properties.message).toEqual('Path `action` is required.');        
+        expect(errors.currency.properties.message).toEqual('Path `currency` is required.');
+        expect(errors.market.properties.message).toEqual('Path `market` is required.');
+        expect(errors.price.properties.message).toEqual('Path `price` is required.');
+        expect(errors.quantity.properties.message).toEqual('Path `quantity` is required.');
     });
 });
