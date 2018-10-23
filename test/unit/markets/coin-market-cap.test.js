@@ -1,7 +1,8 @@
-const { getPrices } = require('../../../lib/util/market-api');
+require('dotenv').config();
+const { getPrices } = require('../../../lib/exchanges/coin-market-cap');
 
-describe('market API', () => {
-    it('returns market info for bitcoin', done => {
+describe('exchange API', () => {
+    it('returns prices for bitcoin', done => {
         let req = {};
 
         let called = false;
