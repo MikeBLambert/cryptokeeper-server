@@ -65,9 +65,6 @@ describe('transaction routes', () => {
         let newAccount = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
-            currencies: [{
-                name: 'BTC', quantity: 2
-            }]
         };
         return request(app)
             .post('/accounts')
@@ -100,5 +97,7 @@ describe('transaction routes', () => {
 
             });
     });
+
+
 
 });
