@@ -58,6 +58,8 @@ const dropCollection = (name) => {
     await console.table(createdUsers);
     await console.table(createdTokens);
     await console.table(createdAccounts);
+    
+    await console.log('test credentials', `email: ${users[0].email}`, `pass: ${users[0].clearPassword}`);
 })();
     
 
