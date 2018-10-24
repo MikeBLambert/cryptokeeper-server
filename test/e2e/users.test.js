@@ -8,7 +8,7 @@ const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
 describe('accounts and holdingz', () => {
     
-    const userTemplates = applyUsers(15);
+    const userTemplates = applyUsers(1);
     let createdUsers;
     let createdTokens;
 
