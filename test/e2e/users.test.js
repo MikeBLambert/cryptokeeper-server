@@ -4,6 +4,7 @@ const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
+const mongoose = require('mongoose');
 
 
 describe('accounts and holdingz', () => {
@@ -158,7 +159,8 @@ describe('transactionz', () => {
     const users = applyUsers(1);
     let createdUsers;
     let createdAccounts;
-    let token;
+    let createdToken;
+
 
     beforeEach(async() => {
         await Promise.all([
@@ -169,18 +171,14 @@ describe('transactionz', () => {
         await Promise.all(users.map(signUp))
             .then(cs => createdUsers = cs);
         await signIn(users[0])
-            .then(createdToken => token = createdToken);
-    });
+            .then(token => createdToken = token);
 
-    beforeEach(async() => {
         let accountData = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
         };
-
         let holdingsData = { name: 'BTC', quantity: 12 };
-
-        let transactionData = {       
+        let transactionData = {
             action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
@@ -190,17 +188,17 @@ describe('transactionz', () => {
 
         await request(app)
             .post('/api/users/accounts')
-            .set('Authorization', `Bearer ${token}`)            
+            .set('Authorization', `Bearer ${createdToken}`)
             .send(accountData);
 
         await request(app)
             .post('/api/users/accounts/holdings')
-            .set('Authorization', `Bearer ${token}`)            
+            .set('Authorization', `Bearer ${createdToken}`)
             .send(holdingsData);
-        
+
         await request(app)
             .post('/api/users/transactions')
-            .set('Authorization', `Bearer ${token}`)            
+            .set('Authorization', `Bearer ${createdToken}`)
             .send(transactionData);
     });
 
@@ -216,10 +214,11 @@ describe('transactionz', () => {
 
         await request(app)
             .post('/api/users/transactions')
-            .set('Authorization', `Bearer ${token}`)            
+            .set('Authorization', `Bearer ${createdToken}`)            
             .send(newTransaction)
             .then(res => {
                 // checkStatus(200)(res);
+
                 expect(res.body).toEqual({ 
                     ...newTransaction,
                     _id: expect.any(String),
@@ -233,7 +232,7 @@ describe('transactionz', () => {
         
         await request(app)
             .get('/api/users/transactions/anyid')
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${createdToken}`)
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({

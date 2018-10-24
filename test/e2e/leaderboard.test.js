@@ -6,6 +6,8 @@ const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
+const mongoose = require('mongoose');
+
 
 
 describe('leaderboard', () => {
@@ -25,6 +27,7 @@ describe('leaderboard', () => {
             .then(cs => createdTokens = cs);
     });
 
+    afterAll(() => mongoose.disconnect());
 
     it('getting the top 10 accounts returns 10 accounts', async() => {
         const account = {

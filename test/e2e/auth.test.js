@@ -5,6 +5,7 @@ const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
+const mongoose = require('mongoose');
 
 
 const checkStatus = statusCode => res => {
@@ -33,6 +34,8 @@ describe('auth routes', () => {
     beforeEach(() => {
         return dropCollection('users');
     });
+
+    afterAll(() => mongoose.disconnect());
 
     beforeEach(() => {
         return Promise.all(users.map(createUser))
@@ -66,7 +69,15 @@ describe('auth routes', () => {
             .send({ name: 'ryan', email: 'ryan@ryan.com', clearPassword: 'testing1234' })
             .then(({ body: user }) => {
                 // const user = res.body
-                expect(user).toEqual({ _id: expect.any(String), name: 'ryan', email: 'ryan@ryan.com', roles: [] });
+                expect(user).toEqual({ 
+                    user: {
+                        _id: expect.any(String), 
+                        name: 'ryan', 
+                        email: 'ryan@ryan.com', 
+                        roles: [] 
+                    },
+                    token: expect.any(String)
+                });
             });
     });
 
