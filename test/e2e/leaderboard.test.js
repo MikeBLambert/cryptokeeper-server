@@ -1,3 +1,4 @@
+require('dotenv').config();
 
 const { dropCollection } = require('../util/db');
 const app = require('../../lib/app');
