@@ -261,6 +261,14 @@ describe('transactionz', () => {
 
         let holdingsData = { name: 'BTC', quantity: 12 };
 
+        let transactionData = {       
+            action: 'buy',
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: chance.natural()
+        };
+
         await request(app)
             .post('/users/accounts')
             .set('Authorization', `Bearer ${token}`)            
@@ -270,6 +278,11 @@ describe('transactionz', () => {
             .post('/users/accounts/holdings')
             .set('Authorization', `Bearer ${token}`)            
             .send(holdingsData);
+        
+        await request(app)
+            .post('/users/transactions')
+            .set('Authorization', `Bearer ${token}`)            
+            .send(transactionData);
     });
 
     it('creates a transaction', async() => {
@@ -292,6 +305,24 @@ describe('transactionz', () => {
                     ...newTransaction,
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
+                    time: expect.any(String)
+                });
+            });
+    });
+
+    it('gets a transaction by user id', async() => {
+        
+        await request(app)
+            .get('/users/transactions/anyid')
+            .set('Authorization', `Bearer ${token}`)
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toEqual({
+                    action: 'buy',
+                    currency: 'BTC',
+                    exchange: 'Fake Market',
+                    price: expect.any(Number),
+                    quantity: expect.any(Number),
                     time: expect.any(String)
                 });
             });
