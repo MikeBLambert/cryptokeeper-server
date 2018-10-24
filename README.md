@@ -45,3 +45,8 @@
 |market prices|table and/or line chart|
 |transaction|form submission|
 |account holdings (all)|table|
+
+
+### Docs to reference
+
+* we are using this API for market data: https://pro.coinmarketcap.com/api/v1#section/Introduction
