@@ -25,7 +25,7 @@ const signUp = user => User.create(user);
 
 const signIn = user => {
     return request(app)
-        .post('/auth/signin')
+        .post('/api/auth/signin')
         .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
         .then(({ body }) => body.token);
 };

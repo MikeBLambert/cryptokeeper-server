@@ -33,7 +33,7 @@ describe('leaderboard', () => {
 
         await Promise.all(createdTokens.map((token) => {
             return request(app)
-                .post('/users/accounts')
+                .post('/api/users/accounts')
                 .set('Authorization', `Bearer ${token}`)
                 .send(account);
         }));
@@ -44,13 +44,13 @@ describe('leaderboard', () => {
                 quantity: chance.natural()
             };
             return request(app)
-                .post('/users/accounts/holdings')
+                .post('/api/users/accounts/holdings')
                 .set('Authorization', `Bearer ${token}`)
                 .send(holding);
         }));
 
         await request(app)
-            .get('/leaderboard')
+            .get('/api/leaderboard')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -68,7 +68,7 @@ describe('leaderboard', () => {
 
         await Promise.all(createdTokens.map((token) => {
             return request(app)
-                .post('/users/accounts')
+                .post('/api/users/accounts')
                 .set('Authorization', `Bearer ${token}`)
                 .send(account);
         }));
@@ -79,7 +79,7 @@ describe('leaderboard', () => {
                 quantity: chance.natural()
             };
             return request(app)
-                .post('/users/accounts/holdings')
+                .post('/api/users/accounts/holdings')
                 .set('Authorization', `Bearer ${token}`)
                 .send(holding);
         }))
@@ -92,7 +92,7 @@ describe('leaderboard', () => {
         // });
 
         await request(app)
-            .get('/leaderboard')
+            .get('/api/leaderboard')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);

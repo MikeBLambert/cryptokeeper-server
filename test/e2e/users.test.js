@@ -29,7 +29,7 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account)
             .then(res => {
@@ -54,11 +54,11 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding)
             .then(res => {
@@ -92,15 +92,15 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .put('/users/accounts/holdings')
+            .put('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(change)
             .then(res => {
@@ -129,15 +129,15 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .get('/users/accounts/anyid')
+            .get('/api/users/accounts/anyid')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -189,17 +189,17 @@ describe('transactionz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${token}`)            
             .send(accountData);
 
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${token}`)            
             .send(holdingsData);
         
         await request(app)
-            .post('/users/transactions')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
             .send(transactionData);
     });
@@ -215,7 +215,7 @@ describe('transactionz', () => {
         };
 
         await request(app)
-            .post('/users/transactions')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
             .send(newTransaction)
             .then(res => {
@@ -232,7 +232,7 @@ describe('transactionz', () => {
     it('gets a transaction by user id', async() => {
         
         await request(app)
-            .get('/users/transactions/anyid')
+            .get('/api/users/transactions/anyid')
             .set('Authorization', `Bearer ${token}`)
             .then(res => {
                 checkStatus(200)(res);
