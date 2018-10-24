@@ -4,7 +4,7 @@ const connect = require('./lib/util/connect');
 const { createServer } = require('http');
 const app = require('./lib/app');
 
-const port = 9876;
+const port = process.env.PORT;
 
 connect(process.env.MONGODB_URI);
 const server = createServer(app);
