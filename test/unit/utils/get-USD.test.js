@@ -14,25 +14,16 @@ describe('get total USD', () => {
     let createdToken;
     let token;
 
-    let marketData = [{ 'circulating_supply': 17339437, 
-        'cmc_rank': 1, 
-        'date_added': '2013-04-28T00:00:00.000Z', 
-        'id': 1, 
-        'last_updated': '2018-10-24T16:50:30.000Z', 
-        'max_supply': 21000000, 
-        'name': 'Bitcoin', 
-        'num_market_pairs': 6461, 
-        'quote': { 'USD': { 'last_updated': '2018-10-24T16:50:30.000Z', 
-            'market_cap': 112694764843.75227, 
-            'percent_change_1h': 0.180097, 
-            'percent_change_24h': 0.498449, 
-            'percent_change_7d': -0.600313, 
-            'price': 6499.33240876, 
-            'volume_24h': 3429219996.76878 } }, 
-        'slug': 'bitcoin', 
-        'symbol': 'BTC', 
-        'total_supply': 17339437 
-    }];
+    let marketData = [
+        {
+            'quote': { 'USD': { 'price': 6499.33240876 } },
+            'symbol': 'BTC'
+        },
+        {
+            'quote': { 'USD': { 'price': 203.585469611 } }, 
+            'symbol': 'ETH'
+        }
+    ];
 
     beforeEach(async() => {
         await Promise.all([
@@ -52,12 +43,12 @@ describe('get total USD', () => {
             exchange: 'Fake Market',
         };
 
-        let holdingsData1 = { name: 'Bitcoin', quantity: 12 };
-        let holdingsData2 = { name: 'Etherium', quantity: 80 };
+        let holdingsData1 = { name: 'BTC', quantity: 12 };
+        let holdingsData2 = { name: 'ETH', quantity: 80 };
 
         let transactionData = {       
             action: 'buy',
-            currency: 'Bitcoin',
+            currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
             quantity: 2
@@ -93,8 +84,7 @@ describe('get total USD', () => {
             .then(res => {
                 userCurrencies = res.body.currencies;
                 const totalCurrencies = getTotalInUSD(userCurrencies, marketData);
-                expect(totalCurrencies).toEqual(expect.any(Array));
-
+                expect(totalCurrencies).toEqual(107277.49)
             });           
             
 
