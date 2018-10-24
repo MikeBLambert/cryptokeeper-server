@@ -28,6 +28,17 @@ describe('exchange API', () => {
         
         return getPrices(req, null, next);
     });
+    it('the top 20 array includes Bitcoin and Ethereum', done => {
+        let req = {};
+
+        const next = () => {
+            expect(req.marketData[0].name).toEqual('Bitcoin');
+            expect(req.marketData[1].name).toEqual('Ethereum');
+            done();
+        };
+        
+        return getPrices(req, null, next);
+    });
     
 
 });
