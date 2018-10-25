@@ -1,4 +1,4 @@
-const User = require('../../lib/models/User');
+// const User = require('../../lib/models/User');
 const request = require('supertest');
 const app = require('../../lib/app');
 const Chance = require('chance');
@@ -22,11 +22,15 @@ const applyUsers = function(length) {
         .map(() => ({ name: chance.name(), clearPassword: chance.word(), email: chance.email() }));
 };
 
-const signUp = user => User.create(user);
-
+const signUp = user => {
+    return request(app)
+        .post('/api/auth/signup')
+        .send({ name: `${user.name}`, email: `${user.email}`, clearPassword: `${user.clearPassword}` })
+        .then(({ body }) => body.user);
+};
 const signIn = user => {
     return request(app)
-        .post('/auth/signin')
+        .post('/api/auth/signin')
         .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
         .then(({ body }) => body.token);
 };
