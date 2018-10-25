@@ -8,7 +8,7 @@ const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 const mongoose = require('mongoose');
 
 
-describe('accounts and holdingz', () => {
+describe('accounts and holdings', () => {
 
     const userTemplates = applyUsers(1);
     let createdUsers;
@@ -52,7 +52,7 @@ describe('accounts and holdingz', () => {
 
         const holding = {
             name: 'BTC',
-            quantity: chance.natural()
+            quantity: chance.natural({ min: 1, max: 15 })
         };
 
         await request(app)
@@ -69,7 +69,11 @@ describe('accounts and holdingz', () => {
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
                     exchange: account.exchange,
-                    currencies: [{ _id: expect.any(String), name: 'USD', quantity: 10000 }, {
+                    currencies: [{ 
+                        _id: expect.any(String), 
+                        name: 'USD', 
+                        quantity: expect.any(Number) }, 
+                    {
                         ...holding,
                         _id: expect.any(String)
                     }]
@@ -113,6 +117,10 @@ describe('accounts and holdingz', () => {
                     exchange: account.exchange,
                     currencies: [{
                         _id: expect.any(String),
+                        name: 'USD',
+                        quantity: expect.any(Number)
+                    }, {
+                        _id: expect.any(String),
                         name: holding.name,
                         quantity: holding.quantity + change.quantity
                     }]
@@ -127,7 +135,7 @@ describe('accounts and holdingz', () => {
 
         const holding = {
             name: 'BTC',
-            quantity: chance.natural()
+            quantity: chance.natural({ min: 1, max: 12 })
         };
 
         await request(app)
@@ -146,7 +154,7 @@ describe('accounts and holdingz', () => {
                 expect(res.body).toEqual({
 
                     exchange: account.exchange,
-                    currencies: [{ name: 'USD', quantity: 10000 }, { ...holding }]
+                    currencies: [{ name: 'USD', quantity: expect.any(Number) }, { ...holding }]
                 });
             });
     });
