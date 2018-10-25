@@ -1,6 +1,8 @@
 require('dotenv').config();
 const { getPrices } = require('../../../lib/exchanges/coin-market-cap');
 
+jest.mock('../../../lib/streamer/api-watcher');
+
 describe('exchange API', () => {
     it('runs without error', done => {
         let req = {};
@@ -22,7 +24,7 @@ describe('exchange API', () => {
         let req = {};
 
         const next = () => {
-            expect(req.marketData).toHaveLength(20);
+            expect(Object.keys(req.marketData)).toHaveLength(10);
             done();
         };
         
@@ -32,8 +34,9 @@ describe('exchange API', () => {
         let req = {};
 
         const next = () => {
-            expect(req.marketData[0].name).toEqual('Bitcoin');
-            expect(req.marketData[1].name).toEqual('Ethereum');
+            expect(req.marketData.BTC).toHaveProperty('price');
+            expect(req.marketData.BTC).toHaveProperty('rank');
+            expect(req.marketData.BTC).toHaveProperty('updated');
             done();
         };
         

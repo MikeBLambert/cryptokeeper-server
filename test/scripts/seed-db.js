@@ -49,7 +49,7 @@ const dropCollection = (name) => {
         .set('Authorization', `Bearer ${createdTokens[0]}`)
         .send(holding);
     await request(app)
-        .get('/api/users/accounts/anyid')
+        .get('/api/users/accounts')
         .set('Authorization', `Bearer ${createdTokens[0]}`)
         .then(({ body }) => createdAccounts = body);  
     

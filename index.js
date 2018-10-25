@@ -4,6 +4,9 @@ const connect = require('./lib/util/connect');
 const { createServer } = require('http');
 const app = require('./lib/app');
 
+const { startWatch } = require('./lib/streamer/api-watcher');
+startWatch();
+
 const port = process.env.PORT || 9876;
 
 connect(process.env.MONGODB_URI);

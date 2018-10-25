@@ -4,6 +4,7 @@ const { dropCollection } = require('../util/db');
 const app = require('../../lib/app');
 const request = require('supertest');
 
+jest.mock('../../lib/streamer/api-watcher');
 
 describe('price index', () => {
 
@@ -29,7 +30,9 @@ describe('price index', () => {
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
-                expect(res.body).toHaveLength(10);
+                expect(res.body).toBeInstanceOf(Object);
+                expect(Object.keys(res.body)).toHaveLength(10);
+                expect(res.body).toHaveProperty('BTC');
             });
     });
 

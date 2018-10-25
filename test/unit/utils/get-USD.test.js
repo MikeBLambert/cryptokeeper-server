@@ -8,22 +8,28 @@ const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../../util/helpers');
 
+
+jest.mock('../../../lib/streamer/api-watcher');
+
+
 describe('get total USD', () => {
     const users = applyUsers(1);
     let createdUsers;
     let createdToken;
     let token;
 
-    let marketData = [
-        {
-            'quote': { 'USD': { 'price': 6499.33240876 } },
-            'symbol': 'BTC'
+    let marketData = {
+        BTC: {
+            price: 6499.33240876,
+            rank: 1,
+            updated: new Date().toISOString()
         },
-        {
-            'quote': { 'USD': { 'price': 203.585469611 } }, 
-            'symbol': 'ETH'
+        ETH: {
+            price: 203.585469611,
+            rank: 2,
+            updated: new Date().toISOString()
         }
-    ];
+    };
 
     beforeEach(async() => {
         await Promise.all([
@@ -76,10 +82,11 @@ describe('get total USD', () => {
     });
 
     it('takes a user id and market data and returns total value of currencies in USD', () => {
+
         let userCurrencies;
 
         return request(app)
-            .get('/api/users/accounts/anyid')
+            .get('/api/users/accounts')
             .set('Authorization', `Bearer ${token}`) 
             .then(res => {
                 userCurrencies = res.body.currencies;

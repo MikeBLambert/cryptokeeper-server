@@ -8,7 +8,7 @@ const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 const mongoose = require('mongoose');
 
-
+jest.mock('../../lib/streamer/api-watcher');
 
 describe('leaderboard', () => {
 
