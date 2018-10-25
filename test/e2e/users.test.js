@@ -44,6 +44,29 @@ describe('accounts and holdings', () => {
             });
     });
 
+    it('does not create an account if there is already an account made for a user in that marketplace', async() => {
+        const account = {
+            exchange: 'Fake Market',
+        };
+
+        const account2 = {
+            exchange: 'Fake Market',
+        };
+
+        await request(app)
+            .post('/users/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(account);
+        await request(app)
+            .post('/users/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(account2)
+            .then(res => {
+                expect(res.status).toEqual(403);
+                expect(res.body).toEqual( { "error": "Users may have only one account per marketplace" });
+            });
+    });
+
     it('adds holding for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
