@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { dropCollection } = require('../util/db');
 const app = require('../../lib/app');
 const request = require('supertest');
@@ -6,7 +7,7 @@ const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
 
-describe('accounts and holdingz', () => {
+describe('accounts and holdings', () => {
     
     const userTemplates = applyUsers(1);
     let createdUsers;
@@ -151,9 +152,49 @@ describe('accounts and holdingz', () => {
             });
     });
 
+    
+    it('gets an account total for a particular user', async() => {
+        
+        const account = {
+            exchange: 'Fake Market',
+        };
+    
+        const holding = {
+            name: 'BTC',
+            quantity: 2
+        };
+    
+        const holding2 = {
+            name: 'BTC',
+            quantity: 5
+        };
+
+        await request(app)
+            .post('/users/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(account);
+        await request(app)
+            .post('/users/accounts/holdings')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(holding);
+        await request(app)
+            .post('/users/accounts/holdings')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(holding2);
+        await request(app)
+            .get('/users/accounts/total')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toEqual(expect.any(Number));
+            });
+
+        
+    });
+
 });
 
-describe('transactionz', () => {
+describe('transactions', () => {
     
     const users = applyUsers(1);
     let createdUsers;

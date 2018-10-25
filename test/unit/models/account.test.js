@@ -26,4 +26,6 @@ describe('account model', () => {
         expect(errors.user.properties.message).toEqual('Path `user` is required.');
         expect(errors.exchange.properties.message).toEqual('Path `exchange` is required.');
     });
+
+    
 });
