@@ -14,7 +14,7 @@ describe('accounts and holdingz', () => {
     let createdUsers;
     let createdTokens;
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         await Promise.all([
             dropCollection('users'),
             dropCollection('accounts'),
@@ -25,7 +25,7 @@ describe('accounts and holdingz', () => {
             .then(cs => createdTokens = cs);
     });
 
-    it('creates an account for an authorized user', async () => {
+    it('creates an account for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -45,7 +45,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('adds holding for an authorized user', async () => {
+    it('adds holding for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -77,7 +77,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('increments the value of a holding', async () => {
+    it('increments the value of a holding', async() => {
 
         const account = {
             exchange: 'Fake Market',
@@ -120,7 +120,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('gets an account for an authorized user', async () => {
+    it('gets an account for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -204,7 +204,7 @@ describe('transactions', () => {
     let createdToken;
 
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         await Promise.all([
             dropCollection('users'),
             dropCollection('accounts'),
@@ -215,7 +215,6 @@ describe('transactions', () => {
         await signIn(users[0])
             .then(token => createdToken = token);
 
-    beforeEach(async () => {
         let accountData = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
@@ -223,7 +222,6 @@ describe('transactions', () => {
         let holdingsData = { name: 'BTC', quantity: 12 };
 
         let transactionData = {
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -246,10 +244,9 @@ describe('transactions', () => {
             .send(transactionData);
     });
 
-    it('creates a transaction', async () => {
+    it('creates a transaction', async() => {
 
         let newTransaction = {
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -271,7 +268,7 @@ describe('transactions', () => {
             });
     });
 
-    it('gets a transaction by user id', async () => {
+    it('gets a transaction by user id', async() => {
 
         await request(app)
             .get('/api/users/transactions/anyid')
@@ -279,7 +276,6 @@ describe('transactions', () => {
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({
-                    action: 'buy',
                     currency: 'BTC',
                     exchange: 'Fake Market',
                     price: expect.any(Number),
