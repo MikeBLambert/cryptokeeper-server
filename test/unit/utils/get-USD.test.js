@@ -55,22 +55,22 @@ describe('get total USD', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${token}`)            
             .send(accountData);
 
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${token}`)            
             .send(holdingsData1);
 
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${token}`)            
             .send(holdingsData2);
         
         await request(app)
-            .post('/users/transactions')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
             .send(transactionData);
     });
@@ -79,12 +79,12 @@ describe('get total USD', () => {
         let userCurrencies;
 
         return request(app)
-            .get('/users/accounts/anyid')
+            .get('/api/users/accounts/anyid')
             .set('Authorization', `Bearer ${token}`) 
             .then(res => {
                 userCurrencies = res.body.currencies;
                 const totalCurrencies = getTotalInUSD(userCurrencies, marketData);
-                expect(totalCurrencies).toEqual(107277.49)
+                expect(totalCurrencies).toEqual(107277.49);
             });           
             
 
