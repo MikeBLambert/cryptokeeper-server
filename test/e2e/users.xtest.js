@@ -5,17 +5,18 @@ const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
+const mongoose = require('mongoose');
 
 
-describe('accounts and holdings', () => {
-    
+describe('accounts and holdingz', () => {
+
     const userTemplates = applyUsers(1);
     let createdUsers;
     let createdTokens;
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         await Promise.all([
-            dropCollection('users'), 
+            dropCollection('users'),
             dropCollection('accounts'),
         ]);
         await Promise.all(userTemplates.map(signUp))
@@ -24,13 +25,13 @@ describe('accounts and holdings', () => {
             .then(cs => createdTokens = cs);
     });
 
-    it('creates an account for an authorized user', async() => {
+    it('creates an account for an authorized user', async () => {
         const account = {
             exchange: 'Fake Market',
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account)
             .then(res => {
@@ -44,7 +45,7 @@ describe('accounts and holdings', () => {
             });
     });
 
-    it('adds holding for an authorized user', async() => {
+    it('adds holding for an authorized user', async () => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -55,11 +56,11 @@ describe('accounts and holdings', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding)
             .then(res => {
@@ -76,7 +77,7 @@ describe('accounts and holdings', () => {
             });
     });
 
-    it('increments the value of a holding', async() => {
+    it('increments the value of a holding', async () => {
 
         const account = {
             exchange: 'Fake Market',
@@ -93,15 +94,15 @@ describe('accounts and holdings', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .put('/users/accounts/holdings')
+            .put('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(change)
             .then(res => {
@@ -119,7 +120,7 @@ describe('accounts and holdings', () => {
             });
     });
 
-    it('gets an account for an authorized user', async() => {
+    it('gets an account for an authorized user', async () => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -130,15 +131,15 @@ describe('accounts and holdings', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .get('/users/accounts/anyid')
+            .get('/api/users/accounts/anyid')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -196,12 +197,14 @@ describe('accounts and holdings', () => {
 
 describe('transactions', () => {
     
+
     const users = applyUsers(1);
     let createdUsers;
     let createdAccounts;
-    let token;
+    let createdToken;
 
-    beforeEach(async() => {
+
+    beforeEach(async () => {
         await Promise.all([
             dropCollection('users'),
             dropCollection('accounts'),
@@ -210,18 +213,16 @@ describe('transactions', () => {
         await Promise.all(users.map(signUp))
             .then(cs => createdUsers = cs);
         await signIn(users[0])
-            .then(createdToken => token = createdToken);
-    });
+            .then(token => createdToken = token);
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         let accountData = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
         };
-
         let holdingsData = { name: 'BTC', quantity: 12 };
 
-        let transactionData = {       
+        let transactionData = {
             action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
@@ -230,23 +231,23 @@ describe('transactions', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
-            .set('Authorization', `Bearer ${token}`)            
+            .post('/api/users/accounts')
+            .set('Authorization', `Bearer ${createdToken}`)
             .send(accountData);
 
         await request(app)
-            .post('/users/accounts/holdings')
-            .set('Authorization', `Bearer ${token}`)            
+            .post('/api/users/accounts/holdings')
+            .set('Authorization', `Bearer ${createdToken}`)
             .send(holdingsData);
-        
+
         await request(app)
-            .post('/users/transactions')
-            .set('Authorization', `Bearer ${token}`)            
+            .post('/api/users/transactions')
+            .set('Authorization', `Bearer ${createdToken}`)
             .send(transactionData);
     });
 
-    it('creates a transaction', async() => {
-        
+    it('creates a transaction', async () => {
+
         let newTransaction = {
             action: 'buy',
             currency: 'BTC',
@@ -256,8 +257,8 @@ describe('transactions', () => {
         };
 
         await request(app)
-            .post('/users/transactions')
-            .set('Authorization', `Bearer ${token}`)            
+            .post('/api/users/transactions')
+            .set('Authorization', `Bearer ${createdToken}`)            
             .send(newTransaction)
             .then(res => {
                 // checkStatus(200)(res);
@@ -270,11 +271,11 @@ describe('transactions', () => {
             });
     });
 
-    it('gets a transaction by user id', async() => {
-        
+    it('gets a transaction by user id', async () => {
+
         await request(app)
-            .get('/users/transactions/anyid')
-            .set('Authorization', `Bearer ${token}`)
+            .get('/api/users/transactions/anyid')
+            .set('Authorization', `Bearer ${createdToken}`)
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({
