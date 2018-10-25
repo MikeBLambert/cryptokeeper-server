@@ -29,7 +29,7 @@ describe('leaderboard', () => {
 
     afterAll(() => mongoose.disconnect());
 
-    it('getting the top 10 accounts returns 10 accounts', async() => {
+    it('returns the top 10 users', async() => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -42,14 +42,25 @@ describe('leaderboard', () => {
         }));
 
         await Promise.all(createdTokens.map((token) => {
-            const holding = {
+            const holding1 = {
                 name: 'BTC',
                 quantity: chance.natural()
             };
             return request(app)
                 .post('/api/users/accounts/holdings')
                 .set('Authorization', `Bearer ${token}`)
-                .send(holding);
+                .send(holding1);
+        }));
+
+        await Promise.all(createdTokens.map((token) => {
+            const holding2 = {
+                name: 'ETH',
+                quantity: chance.natural()
+            };
+            return request(app)
+                .post('/api/users/accounts/holdings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(holding2);
         }));
 
         await request(app)
@@ -58,55 +69,17 @@ describe('leaderboard', () => {
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toHaveLength(10);
-
-            });
-    });
-
-    it('getting the top 10 accounts by account value returns the top 10 by market value', async() => {
-        const account = {
-            exchange: 'Fake Market',
-        };
-
-        let createdAccounts;
-
-        await Promise.all(createdTokens.map((token) => {
-            return request(app)
-                .post('/api/users/accounts')
-                .set('Authorization', `Bearer ${token}`)
-                .send(account);
-        }));
-
-        await Promise.all(createdTokens.map((token) => {
-            const holding = {
-                name: 'BTC',
-                quantity: chance.natural()
-            };
-            return request(app)
-                .post('/api/users/accounts/holdings')
-                .set('Authorization', `Bearer ${token}`)
-                .send(holding);
-        }))
-            .then(cs => createdAccounts = cs);
-
-        // set variable here that calls in middleware/util that defines current market value of an account:
-
-        // const topTen = createdAccounts.sort((a, b) => {
-        //     // a.reduce
-        // });
-
-        await request(app)
-            .get('/api/leaderboard')
-            .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .then(res => {
-                checkStatus(200)(res);
-            // expect(res.body).toEqual({
-            //     _id: expect.any(String),
-            //     user: createdUsers[0]._id.toString(),
-            //     exchange: account.exchange,
-            //     currencies: [{
-            //         ...holding,
-            //     }]
-            // });
+                expect(res.body[0].usd).toBeGreaterThan(res.body[1].usd);
+                res.body.forEach(topUser => {
+                    expect(topUser.user).toBeTruthy();
+                    expect(topUser.usd).toEqual(expect.any(Number));
+                    expect(topUser.accounts).toEqual(expect.any(Array));
+                });
             });
     });
 });
+ 
+
+
+
+

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { dropCollection } = require('../util/db');
 const app = require('../../lib/app');
 const request = require('supertest');
@@ -8,14 +9,14 @@ const mongoose = require('mongoose');
 
 
 describe('accounts and holdingz', () => {
-    
+
     const userTemplates = applyUsers(1);
     let createdUsers;
     let createdTokens;
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         await Promise.all([
-            dropCollection('users'), 
+            dropCollection('users'),
             dropCollection('accounts'),
         ]);
         await Promise.all(userTemplates.map(signUp))
@@ -24,7 +25,7 @@ describe('accounts and holdingz', () => {
             .then(cs => createdTokens = cs);
     });
 
-    it('creates an account for an authorized user', async() => {
+    it('creates an account for an authorized user', async () => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -41,6 +42,29 @@ describe('accounts and holdingz', () => {
                     exchange: account.exchange,
                     currencies: []
                 });
+            });
+    });
+
+    it('does not create an account if there is already an account made for a user in that marketplace', async() => {
+        const account = {
+            exchange: 'Fake Market',
+        };
+
+        const account2 = {
+            exchange: 'Fake Market',
+        };
+
+        await request(app)
+            .post('/users/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(account);
+        await request(app)
+            .post('/users/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(account2)
+            .then(res => {
+                expect(res.status).toEqual(403);
+                expect(res.body).toEqual( { "error": "Users may have only one account per marketplace" });
             });
     });
 
@@ -76,7 +100,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('increments the value of a holding', async() => {
+    it('increments the value of a holding', async () => {
 
         const account = {
             exchange: 'Fake Market',
@@ -119,7 +143,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('gets an account for an authorized user', async() => {
+    it('gets an account for an authorized user', async () => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -152,17 +176,58 @@ describe('accounts and holdingz', () => {
             });
     });
 
+    
+    it('gets an account total for a particular user', async() => {
+        
+        const account = {
+            exchange: 'Fake Market',
+        };
+    
+        const holding = {
+            name: 'BTC',
+            quantity: 2
+        };
+    
+        const holding2 = {
+            name: 'BTC',
+            quantity: 5
+        };
+
+        await request(app)
+            .post('/users/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(account);
+        await request(app)
+            .post('/users/accounts/holdings')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(holding);
+        await request(app)
+            .post('/users/accounts/holdings')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .send(holding2);
+        await request(app)
+            .get('/users/accounts/total')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
+            .then(res => {
+                checkStatus(200)(res);
+                expect(res.body).toEqual(expect.any(Number));
+            });
+
+        
+    });
+
 });
 
-describe('transactionz', () => {
+describe('transactions', () => {
     
+
     const users = applyUsers(1);
     let createdUsers;
     let createdAccounts;
     let createdToken;
 
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         await Promise.all([
             dropCollection('users'),
             dropCollection('accounts'),
@@ -173,11 +238,13 @@ describe('transactionz', () => {
         await signIn(users[0])
             .then(token => createdToken = token);
 
+    beforeEach(async () => {
         let accountData = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
         };
         let holdingsData = { name: 'BTC', quantity: 12 };
+
         let transactionData = {
             action: 'buy',
             currency: 'BTC',
@@ -202,8 +269,8 @@ describe('transactionz', () => {
             .send(transactionData);
     });
 
-    it('creates a transaction', async() => {
-        
+    it('creates a transaction', async () => {
+
         let newTransaction = {
             action: 'buy',
             currency: 'BTC',
@@ -218,7 +285,6 @@ describe('transactionz', () => {
             .send(newTransaction)
             .then(res => {
                 // checkStatus(200)(res);
-
                 expect(res.body).toEqual({ 
                     ...newTransaction,
                     _id: expect.any(String),
@@ -228,8 +294,8 @@ describe('transactionz', () => {
             });
     });
 
-    it('gets a transaction by user id', async() => {
-        
+    it('gets a transaction by user id', async () => {
+
         await request(app)
             .get('/api/users/transactions/anyid')
             .set('Authorization', `Bearer ${createdToken}`)
