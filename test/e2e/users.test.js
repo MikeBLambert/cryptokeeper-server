@@ -11,13 +11,14 @@ const mongoose = require('mongoose');
 jest.mock('../../lib/streamer/api-watcher');
 
 
-describe('accounts and holdingz', () => {
+describe('accounts and holdings', () => {
 
-    const userTemplates = applyUsers(1);
+    const userTemplates = applyUsers(10);
     let createdUsers;
     let createdTokens;
 
     beforeEach(async() => {
+
         await Promise.all([
             dropCollection('users'),
             dropCollection('accounts'),
@@ -27,6 +28,7 @@ describe('accounts and holdingz', () => {
         await Promise.all(userTemplates.map(signIn))
             .then(cs => createdTokens = cs);
     });
+
 
     it('creates an account for an authorized user', async() => {
         const account = {
@@ -58,11 +60,11 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account2)
             .then(res => {
@@ -78,7 +80,7 @@ describe('accounts and holdingz', () => {
 
         const holding = {
             name: 'BTC',
-            quantity: chance.natural()
+            quantity: chance.natural({ min: 1, max: 15 })
         };
 
         await request(app)
@@ -95,7 +97,11 @@ describe('accounts and holdingz', () => {
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
                     exchange: account.exchange,
-                    currencies: [{
+                    currencies: [{ 
+                        _id: expect.any(String), 
+                        name: 'USD', 
+                        quantity: expect.any(Number) }, 
+                    {
                         ...holding,
                         _id: expect.any(String)
                     }]
@@ -103,7 +109,8 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('increments the value of a holding', async() => {
+    it('increments the value of a holding and decrements value in USD', async () => {
+
 
         const account = {
             exchange: 'Fake Market',
@@ -133,18 +140,25 @@ describe('accounts and holdingz', () => {
             .send(change)
             .then(res => {
                 checkStatus(200)(res);
+                expect(res.body.currencies[0].quantity).toBeLessThan(10000000);
                 expect(res.body).toEqual({
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
                     exchange: account.exchange,
                     currencies: [{
                         _id: expect.any(String),
+                        name: 'USD',
+                        quantity: expect.any(Number)
+                    }, {
+                        _id: expect.any(String),
+
                         name: holding.name,
                         quantity: holding.quantity + change.quantity
                     }]
                 });
             });
     });
+
 
     it('gets an account for an authorized user', async() => {
         const account = {
@@ -153,7 +167,8 @@ describe('accounts and holdingz', () => {
 
         const holding = {
             name: 'BTC',
-            quantity: chance.natural()
+            quantity: chance.natural({ min: 1, max: 12 })
+
         };
 
         await request(app)
@@ -170,11 +185,8 @@ describe('accounts and holdingz', () => {
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({
-
                     exchange: account.exchange,
-                    currencies: [{
-                        ...holding,
-                    }]
+                    currencies: [{ name: 'USD', quantity: expect.any(Number) }, { ...holding }]
                 });
             });
     });
@@ -197,19 +209,19 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding2);
         await request(app)
-            .get('/users/accounts/total')
+            .get('/api/users/accounts/total')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -228,6 +240,7 @@ describe('transactions', () => {
     let createdUsers;
     let createdAccounts;
     let createdToken;
+
 
 
     beforeEach(async() => {
@@ -271,6 +284,7 @@ describe('transactions', () => {
             .send(transactionData);
     });
 
+
     it('creates a transaction', async() => {
 
         let newTransaction = {
@@ -278,7 +292,8 @@ describe('transactions', () => {
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
-            quantity: chance.natural()
+            quantity: chance.natural({ min: 1, max: 15 })
+
         };
 
         await request(app)
@@ -286,7 +301,7 @@ describe('transactions', () => {
             .set('Authorization', `Bearer ${createdToken}`)            
             .send(newTransaction)
             .then(res => {
-                // checkStatus(200)(res);
+                checkStatus(200)(res);
                 expect(res.body).toEqual({ 
                     ...newTransaction,
                     _id: expect.any(String),
@@ -295,6 +310,7 @@ describe('transactions', () => {
                 });
             });
     });
+
 
     it('gets a transaction by user id', async() => {
 
@@ -313,8 +329,5 @@ describe('transactions', () => {
                 });
             });
     });
-
-
-
 });
 
