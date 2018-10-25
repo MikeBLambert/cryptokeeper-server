@@ -8,13 +8,16 @@ const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 const mongoose = require('mongoose');
 
 
+jest.mock('../../lib/streamer/api-watcher');
+
+
 describe('accounts and holdingz', () => {
 
     const userTemplates = applyUsers(1);
     let createdUsers;
     let createdTokens;
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         await Promise.all([
             dropCollection('users'),
             dropCollection('accounts'),
@@ -25,7 +28,7 @@ describe('accounts and holdingz', () => {
             .then(cs => createdTokens = cs);
     });
 
-    it('creates an account for an authorized user', async () => {
+    it('creates an account for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -64,7 +67,7 @@ describe('accounts and holdingz', () => {
             .send(account2)
             .then(res => {
                 expect(res.status).toEqual(403);
-                expect(res.body).toEqual( { "error": "Users may have only one account per marketplace" });
+                expect(res.body).toEqual({ 'error': 'Users may have only one account per marketplace' });
             });
     });
 
@@ -100,7 +103,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('increments the value of a holding', async () => {
+    it('increments the value of a holding', async() => {
 
         const account = {
             exchange: 'Fake Market',
@@ -143,7 +146,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('gets an account for an authorized user', async () => {
+    it('gets an account for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -227,7 +230,7 @@ describe('transactions', () => {
     let createdToken;
 
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         await Promise.all([
             dropCollection('users'),
             dropCollection('accounts'),
@@ -238,7 +241,6 @@ describe('transactions', () => {
         await signIn(users[0])
             .then(token => createdToken = token);
 
-    beforeEach(async () => {
         let accountData = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
@@ -269,7 +271,7 @@ describe('transactions', () => {
             .send(transactionData);
     });
 
-    it('creates a transaction', async () => {
+    it('creates a transaction', async() => {
 
         let newTransaction = {
             action: 'buy',
@@ -294,7 +296,7 @@ describe('transactions', () => {
             });
     });
 
-    it('gets a transaction by user id', async () => {
+    it('gets a transaction by user id', async() => {
 
         await request(app)
             .get('/api/users/transactions/anyid')
