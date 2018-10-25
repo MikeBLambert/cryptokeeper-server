@@ -13,6 +13,7 @@ const getErrors = (validation, numberExpected) => {
 };
 
 const checkStatus = statusCode => res => {
+    expect(res.body.error).toBeUndefined();
     expect(res.status).toEqual(statusCode);
 };
 

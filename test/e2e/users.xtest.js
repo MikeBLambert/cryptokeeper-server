@@ -7,14 +7,14 @@ const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
 
 
 describe('accounts and holdingz', () => {
-    
+
     const userTemplates = applyUsers(1);
     let createdUsers;
     let createdTokens;
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         await Promise.all([
-            dropCollection('users'), 
+            dropCollection('users'),
             dropCollection('accounts'),
         ]);
         await Promise.all(userTemplates.map(signUp))
@@ -23,7 +23,7 @@ describe('accounts and holdingz', () => {
             .then(cs => createdTokens = cs);
     });
 
-    it('creates an account for an authorized user', async() => {
+    it('creates an account for an authorized user', async () => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -43,7 +43,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('adds holding for an authorized user', async() => {
+    it('adds holding for an authorized user', async () => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -75,7 +75,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('increments the value of a holding', async() => {
+    it('increments the value of a holding', async () => {
 
         const account = {
             exchange: 'Fake Market',
@@ -118,7 +118,7 @@ describe('accounts and holdingz', () => {
             });
     });
 
-    it('gets an account for an authorized user', async() => {
+    it('gets an account for an authorized user', async () => {
         const account = {
             exchange: 'Fake Market',
         };
@@ -154,13 +154,13 @@ describe('accounts and holdingz', () => {
 });
 
 describe('transactionz', () => {
-    
+
     const users = applyUsers(1);
     let createdUsers;
     let createdAccounts;
     let token;
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         await Promise.all([
             dropCollection('users'),
             dropCollection('accounts'),
@@ -172,7 +172,7 @@ describe('transactionz', () => {
             .then(createdToken => token = createdToken);
     });
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         let accountData = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
@@ -180,7 +180,7 @@ describe('transactionz', () => {
 
         let holdingsData = { name: 'BTC', quantity: 12 };
 
-        let transactionData = {       
+        let transactionData = {
             action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
@@ -190,22 +190,22 @@ describe('transactionz', () => {
 
         await request(app)
             .post('/users/accounts')
-            .set('Authorization', `Bearer ${token}`)            
+            .set('Authorization', `Bearer ${token}`)
             .send(accountData);
 
         await request(app)
             .post('/users/accounts/holdings')
-            .set('Authorization', `Bearer ${token}`)            
+            .set('Authorization', `Bearer ${token}`)
             .send(holdingsData);
-        
+
         await request(app)
             .post('/users/transactions')
-            .set('Authorization', `Bearer ${token}`)            
+            .set('Authorization', `Bearer ${token}`)
             .send(transactionData);
     });
 
-    it('creates a transaction', async() => {
-        
+    it('creates a transaction', async () => {
+
         let newTransaction = {
             action: 'buy',
             currency: 'BTC',
@@ -216,11 +216,11 @@ describe('transactionz', () => {
 
         await request(app)
             .post('/users/transactions')
-            .set('Authorization', `Bearer ${token}`)            
+            .set('Authorization', `Bearer ${token}`)
             .send(newTransaction)
             .then(res => {
                 // checkStatus(200)(res);
-                expect(res.body).toEqual({ 
+                expect(res.body).toEqual({
                     ...newTransaction,
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
@@ -229,8 +229,8 @@ describe('transactionz', () => {
             });
     });
 
-    it('gets a transaction by user id', async() => {
-        
+    it('gets a transaction by user id', async () => {
+
         await request(app)
             .get('/users/transactions/anyid')
             .set('Authorization', `Bearer ${token}`)
