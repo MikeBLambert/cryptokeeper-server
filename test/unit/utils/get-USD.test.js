@@ -84,7 +84,7 @@ describe('get total USD', () => {
             .then(res => {
                 userCurrencies = res.body.currencies;
                 const totalCurrencies = getTotalInUSD(userCurrencies, marketData);
-                expect(totalCurrencies).toEqual(107277.49);
+                expect(totalCurrencies).toEqual(117277.49);
             });           
             
 
