@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 
 describe('accounts and holdings', () => {
 
-    const userTemplates = applyUsers(1);
+    const userTemplates = applyUsers(10);
     let createdUsers;
     let createdTokens;
 
@@ -27,7 +27,7 @@ describe('accounts and holdings', () => {
 
     it('creates an account for an authorized user', async () => {
         const account = {
-            exchange: 'Fake Market',
+            exchange: 'Make Farket',
         };
 
         await request(app)
@@ -55,16 +55,16 @@ describe('accounts and holdings', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account2)
             .then(res => {
                 expect(res.status).toEqual(403);
-                expect(res.body).toEqual( { "error": "Users may have only one account per marketplace" });
+                expect(res.body).toEqual({ 'error': 'Users may have only one account per marketplace' });
             });
     });
 
@@ -104,7 +104,7 @@ describe('accounts and holdings', () => {
             });
     });
 
-    it('increments the value of a holding', async () => {
+    it('increments the value of a holding and decrements value in USD', async () => {
 
         const account = {
             exchange: 'Fake Market',
@@ -134,6 +134,7 @@ describe('accounts and holdings', () => {
             .send(change)
             .then(res => {
                 checkStatus(200)(res);
+                expect(res.body.currencies[0].quantity).toBeLessThan(10000000);
                 expect(res.body).toEqual({
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
@@ -283,7 +284,7 @@ describe('transactions', () => {
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
-            quantity: chance.natural()
+            quantity: chance.natural({ min: 1, max: 15 })
         };
 
         await request(app)
@@ -291,7 +292,7 @@ describe('transactions', () => {
             .set('Authorization', `Bearer ${createdToken}`)            
             .send(newTransaction)
             .then(res => {
-                // checkStatus(200)(res);
+                checkStatus(200)(res);
                 expect(res.body).toEqual({ 
                     ...newTransaction,
                     _id: expect.any(String),
@@ -318,6 +319,8 @@ describe('transactions', () => {
                 });
             });
     });
+
+
 
 
 });
