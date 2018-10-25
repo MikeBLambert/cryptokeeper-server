@@ -6,6 +6,8 @@ const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
+const mongoose = require('mongoose');
+
 
 
 describe('leaderboard', () => {
@@ -25,6 +27,7 @@ describe('leaderboard', () => {
             .then(cs => createdTokens = cs);
     });
 
+    afterAll(() => mongoose.disconnect());
 
     it('returns the top 10 users', async() => {
         const account = {
@@ -33,7 +36,7 @@ describe('leaderboard', () => {
 
         await Promise.all(createdTokens.map((token) => {
             return request(app)
-                .post('/users/accounts')
+                .post('/api/users/accounts')
                 .set('Authorization', `Bearer ${token}`)
                 .send(account);
         }));
@@ -44,7 +47,7 @@ describe('leaderboard', () => {
                 quantity: chance.natural()
             };
             return request(app)
-                .post('/users/accounts/holdings')
+                .post('/api/users/accounts/holdings')
                 .set('Authorization', `Bearer ${token}`)
                 .send(holding1);
         }));
@@ -55,13 +58,13 @@ describe('leaderboard', () => {
                 quantity: chance.natural()
             };
             return request(app)
-                .post('/users/accounts/holdings')
+                .post('/api/users/accounts/holdings')
                 .set('Authorization', `Bearer ${token}`)
                 .send(holding2);
         }));
 
         await request(app)
-            .get('/leaderboard')
+            .get('/api/leaderboard')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);

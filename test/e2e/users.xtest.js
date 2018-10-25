@@ -4,6 +4,7 @@ const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
+const mongoose = require('mongoose');
 
 
 describe('accounts and holdingz', () => {
@@ -29,7 +30,7 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account)
             .then(res => {
@@ -54,11 +55,11 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding)
             .then(res => {
@@ -92,15 +93,15 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .put('/users/accounts/holdings')
+            .put('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(change)
             .then(res => {
@@ -129,15 +130,15 @@ describe('accounts and holdingz', () => {
         };
 
         await request(app)
-            .post('/users/accounts')
+            .post('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/users/accounts/holdings')
+            .post('/api/users/accounts/holdings')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(holding);
         await request(app)
-            .get('/users/accounts/anyid')
+            .get('/api/users/accounts/anyid')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
@@ -158,7 +159,8 @@ describe('transactionz', () => {
     const users = applyUsers(1);
     let createdUsers;
     let createdAccounts;
-    let token;
+    let createdToken;
+
 
     beforeEach(async () => {
         await Promise.all([
@@ -169,17 +171,21 @@ describe('transactionz', () => {
         await Promise.all(users.map(signUp))
             .then(cs => createdUsers = cs);
         await signIn(users[0])
-            .then(createdToken => token = createdToken);
-    });
+            .then(token => createdToken = token);
 
+<<<<<<< HEAD:test/e2e/users.xtest.js
     beforeEach(async () => {
+=======
+>>>>>>> staging:test/e2e/users.test.js
         let accountData = {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
         };
-
         let holdingsData = { name: 'BTC', quantity: 12 };
+<<<<<<< HEAD:test/e2e/users.xtest.js
 
+=======
+>>>>>>> staging:test/e2e/users.test.js
         let transactionData = {
             action: 'buy',
             currency: 'BTC',
@@ -189,6 +195,7 @@ describe('transactionz', () => {
         };
 
         await request(app)
+<<<<<<< HEAD:test/e2e/users.xtest.js
             .post('/users/accounts')
             .set('Authorization', `Bearer ${token}`)
             .send(accountData);
@@ -201,6 +208,20 @@ describe('transactionz', () => {
         await request(app)
             .post('/users/transactions')
             .set('Authorization', `Bearer ${token}`)
+=======
+            .post('/api/users/accounts')
+            .set('Authorization', `Bearer ${createdToken}`)
+            .send(accountData);
+
+        await request(app)
+            .post('/api/users/accounts/holdings')
+            .set('Authorization', `Bearer ${createdToken}`)
+            .send(holdingsData);
+
+        await request(app)
+            .post('/api/users/transactions')
+            .set('Authorization', `Bearer ${createdToken}`)
+>>>>>>> staging:test/e2e/users.test.js
             .send(transactionData);
     });
 
@@ -215,12 +236,12 @@ describe('transactionz', () => {
         };
 
         await request(app)
-            .post('/users/transactions')
-            .set('Authorization', `Bearer ${token}`)
+            .post('/api/users/transactions')
+            .set('Authorization', `Bearer ${createdToken}`)            
             .send(newTransaction)
             .then(res => {
                 // checkStatus(200)(res);
-                expect(res.body).toEqual({
+                expect(res.body).toEqual({ 
                     ...newTransaction,
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
@@ -232,8 +253,8 @@ describe('transactionz', () => {
     it('gets a transaction by user id', async () => {
 
         await request(app)
-            .get('/users/transactions/anyid')
-            .set('Authorization', `Bearer ${token}`)
+            .get('/api/users/transactions/anyid')
+            .set('Authorization', `Bearer ${createdToken}`)
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({

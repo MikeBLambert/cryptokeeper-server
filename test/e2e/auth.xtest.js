@@ -5,6 +5,7 @@ const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const Chance = require('chance');
 const chance = new Chance();
+const mongoose = require('mongoose');
 
 
 const checkStatus = statusCode => res => {
@@ -15,7 +16,7 @@ const checkOk = res => checkStatus(200)(res);
 
 const withToken = user => {
     return request(app)
-        .post('/auth/signin')
+        .post('/api/auth/signin')
         .send({ email: `${user.email}`, clearPassword: `${user.clearPassword}` })
         .then(({ body }) => body.token);
 };
@@ -33,6 +34,8 @@ describe('auth routes', () => {
     beforeEach(() => {
         return dropCollection('users');
     });
+
+    afterAll(() => mongoose.disconnect());
 
     beforeEach(() => {
         return Promise.all(users.map(createUser))
@@ -53,19 +56,28 @@ describe('auth routes', () => {
             name: 'ryan',
             clearPassword: 'testing1234',
             email: 'ryan@test.com'
-        }).then(user => {
-            expect(user.clearPassword).not.toEqual('testing1234');
-            expect(bcrypt.compareSync('testing1234', user.passwordHash));
-        });
+        })
+            .then(user => {
+                expect(user.clearPassword).not.toEqual('testing1234');
+                expect(bcrypt.compareSync('testing1234', user.passwordHash));
+            });
     });
 
     it('creates a user on signup', () => {
         return request(app)
-            .post('/auth/signup')
+            .post('/api/auth/signup')
             .send({ name: 'ryan', email: 'ryan@ryan.com', clearPassword: 'testing1234' })
             .then(({ body: user }) => {
                 // const user = res.body
-                expect(user).toEqual({ _id: expect.any(String), name: 'ryan', email: 'ryan@ryan.com', roles: [] });
+                expect(user).toEqual({ 
+                    user: {
+                        _id: expect.any(String), 
+                        name: 'ryan', 
+                        email: 'ryan@ryan.com', 
+                        roles: [] 
+                    },
+                    token: expect.any(String)
+                });
             });
     });
 
@@ -82,7 +94,7 @@ describe('auth routes', () => {
 
     it('signs in a user', () => {
         return request(app)
-            .post('/auth/signin')
+            .post('/api/auth/signin')
             .send({ email: createdUsers[0].email, clearPassword: users[0].clearPassword })
             .then(res => {
                 checkOk(res);
@@ -92,14 +104,14 @@ describe('auth routes', () => {
 
     it('rejects signing in a bad user', () => {
         return request(app)
-            .post('/auth/signin')
+            .post('/api/auth/signin')
             .send({ email: createdUsers[0].email, clearPassword: `${users[0].clearPassword}1234` })
             .then(checkStatus(401));
     });
 
     it('rejects signing in a user with bad email', () => {
         return request(app)
-            .post('/auth/signin')
+            .post('/api/auth/signin')
             .set('Authorization', `Bearer ${token}`)
             .send({ email: `${createdUsers[0].email}`, clearPassword: `${users[0].clearPassword}1234` })
             .then(checkStatus(401));
@@ -109,7 +121,7 @@ describe('auth routes', () => {
         return withToken(users[0])
             .then(token => {
                 return request(app)
-                    .get('/auth/verify')
+                    .get('/api/auth/verify')
                     .set('Authorization', `Bearer ${token}`)
                     .then(res => {
                         expect(res.body).toEqual({ success: true });
