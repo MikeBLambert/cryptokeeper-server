@@ -79,7 +79,7 @@ describe('get total USD', () => {
         let userCurrencies;
 
         return request(app)
-            .get('/users/accounts/anyid')
+            .get('/users/accounts')
             .set('Authorization', `Bearer ${token}`) 
             .then(res => {
                 userCurrencies = res.body.currencies;
