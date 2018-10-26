@@ -47,7 +47,7 @@ describe('leaderboard', () => {
                 quantity: chance.natural({ min: 5, max: 15 })
             };
             return request(app)
-                .post('/api/users/accounts/holdings')
+                .post('/api/users/transactions')
                 .set('Authorization', `Bearer ${token}`)
                 .send(holding1);
         }));
@@ -58,7 +58,7 @@ describe('leaderboard', () => {
                 quantity: chance.natural({ min: 5, max: 15 })
             };
             return request(app)
-                .post('/api/users/accounts/holdings')
+                .post('/api/users/transactions')
                 .set('Authorization', `Bearer ${token}`)
                 .send(holding2);
         }));

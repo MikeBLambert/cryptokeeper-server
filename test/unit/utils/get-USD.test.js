@@ -66,12 +66,12 @@ describe('get total USD', () => {
             .send(accountData);
 
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
             .send(holdingsData1);
 
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
             .send(holdingsData2);
         
