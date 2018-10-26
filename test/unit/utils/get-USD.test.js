@@ -1,12 +1,11 @@
 require('dotenv').config();
-const { getPrices } = require('../../../lib/exchanges/coin-market-cap');
-const { getTotalInUSD, getSingleValueInUSD } = require('../../../lib/util/get-USD');
+const { getTotalInUSD } = require('../../../lib/util/get-USD');
 const { dropCollection } = require('../../util/db');
 const app = require('../../../lib/app');
 const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
-const { checkStatus, signUp, signIn, applyUsers } = require('../../util/helpers');
+const { signUp, signIn, applyUsers } = require('../../util/helpers');
 
 
 jest.mock('../../../lib/streamer/api-watcher');
@@ -15,7 +14,6 @@ jest.mock('../../../lib/streamer/api-watcher');
 describe('get total USD', () => {
     const users = applyUsers(1);
     let createdUsers;
-    let createdToken;
     let token;
 
     let marketData = {
@@ -49,11 +47,22 @@ describe('get total USD', () => {
             exchange: 'Fake Market',
         };
 
-        let holdingsData1 = { name: 'BTC', quantity: 12 };
-        let holdingsData2 = { name: 'ETH', quantity: 80 };
+        let transactionData1 = {       
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: 12
+        };
 
-        let transactionData = {       
-            action: 'buy',
+
+        let transactionData2 = {       
+            currency: 'ETH',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: 80
+        };
+
+        let transactionData3 = {       
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -66,19 +75,19 @@ describe('get total USD', () => {
             .send(accountData);
 
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
-            .send(holdingsData1);
+            .send(transactionData1);
 
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
-            .send(holdingsData2);
+            .send(transactionData2);
         
         await request(app)
             .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
-            .send(transactionData);
+            .send(transactionData3);
     });
 
     it('takes a user id and market data and returns total value of currencies in USD', () => {

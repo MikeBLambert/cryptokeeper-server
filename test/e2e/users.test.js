@@ -5,8 +5,6 @@ const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
-const mongoose = require('mongoose');
-
 
 jest.mock('../../lib/streamer/api-watcher');
 
@@ -73,56 +71,25 @@ describe('accounts and holdings', () => {
             });
     });
 
-    it('adds holding for an authorized user', async() => {
-        const account = {
-            exchange: 'Fake Market',
-        };
-
-        const holding = {
-            name: 'BTC',
-            quantity: chance.natural({ min: 1, max: 15 })
-        };
-
-        await request(app)
-            .post('/api/users/accounts')
-            .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(account);
-        await request(app)
-            .post('/api/users/accounts/holdings')
-            .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(holding)
-            .then(res => {
-                checkStatus(200)(res);
-                expect(res.body).toEqual({
-                    _id: expect.any(String),
-                    user: createdUsers[0]._id.toString(),
-                    exchange: account.exchange,
-                    currencies: [{ 
-                        _id: expect.any(String), 
-                        name: 'USD', 
-                        quantity: expect.any(Number) }, 
-                    {
-                        ...holding,
-                        _id: expect.any(String)
-                    }]
-                });
-            });
-    });
-
-    it('increments the value of a holding and decrements value in USD', async() => {
-
+    it('creates a holding, increments its value, and decrements value in USD', async() => {
 
         const account = {
             exchange: 'Fake Market',
         };
 
-        const holding = {
-            name: 'BTC',
+        const transaction = {
+            user: createdUsers[0]._id,
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
             quantity: 4
         };
 
         const change = {
-            name: 'BTC',
+            user: createdUsers[0]._id,
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
             quantity: 2
         };
 
@@ -131,44 +98,43 @@ describe('accounts and holdings', () => {
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(holding);
+            .send(transaction);
         await request(app)
-            .put('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(change)
+            .send(change);
+        await request(app)
+            .get('/api/users/accounts')
+            .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body.currencies[0].quantity).toBeLessThan(10000000);
                 expect(res.body).toEqual({
-                    _id: expect.any(String),
-                    user: createdUsers[0]._id.toString(),
                     exchange: account.exchange,
                     currencies: [{
-                        _id: expect.any(String),
                         name: 'USD',
                         quantity: expect.any(Number)
                     }, {
-                        _id: expect.any(String),
-
-                        name: holding.name,
-                        quantity: holding.quantity + change.quantity
+                        name: 'BTC',
+                        quantity: transaction.quantity + change.quantity
                     }]
                 });
             });
     });
-
 
     it('gets an account for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
 
-        const holding = {
-            name: 'BTC',
+        const transaction = {
+            user: createdUsers[0]._id,
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
             quantity: chance.natural({ min: 1, max: 12 })
-
         };
 
         await request(app)
@@ -176,9 +142,9 @@ describe('accounts and holdings', () => {
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(holding);
+            .send(transaction);
         await request(app)
             .get('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
@@ -186,11 +152,11 @@ describe('accounts and holdings', () => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({
                     exchange: account.exchange,
-                    currencies: [{ name: 'USD', quantity: expect.any(Number) }, { ...holding }]
+                    currencies: [{ name: 'USD', quantity: expect.any(Number) }, 
+                        { name: transaction.currency, quantity: transaction.quantity }]
                 });
             });
     });
-
     
     it('gets an account total for a particular user', async() => {
         
@@ -198,14 +164,20 @@ describe('accounts and holdings', () => {
             exchange: 'Fake Market',
         };
     
-        const holding = {
-            name: 'BTC',
-            quantity: 2
+        const transaction1 = {
+            user: createdUsers[0]._id,
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: chance.natural({ min: 1, max: 12 })
         };
     
-        const holding2 = {
-            name: 'BTC',
-            quantity: 5
+        const transaction2 = {
+            user: createdUsers[0]._id,
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: chance.natural({ min: 1, max: 12 })
         };
 
         await request(app)
@@ -213,35 +185,28 @@ describe('accounts and holdings', () => {
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .send(account);
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(holding);
+            .send(transaction1);
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(holding2);
+            .send(transaction2);
         await request(app)
             .get('/api/users/accounts/total')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual(expect.any(Number));
-            });
-
-        
+            });   
     });
-
 });
 
 describe('transactions', () => {
     
-
     const users = applyUsers(1);
     let createdUsers;
-    let createdAccounts;
     let createdToken;
-
-
 
     beforeEach(async() => {
         await Promise.all([
@@ -258,10 +223,8 @@ describe('transactions', () => {
             user: createdUsers[0]._id,
             exchange: 'Fake Market',
         };
-        let holdingsData = { name: 'BTC', quantity: 12 };
 
         let transactionData = {
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -274,9 +237,9 @@ describe('transactions', () => {
             .send(accountData);
 
         await request(app)
-            .post('/api/users/accounts/holdings')
+            .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdToken}`)
-            .send(holdingsData);
+            .send(transactionData);
 
         await request(app)
             .post('/api/users/transactions')
@@ -284,16 +247,13 @@ describe('transactions', () => {
             .send(transactionData);
     });
 
-
     it('creates a transaction', async() => {
 
         let newTransaction = {
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
             quantity: chance.natural({ min: 1, max: 15 })
-
         };
 
         await request(app)
@@ -311,7 +271,6 @@ describe('transactions', () => {
             });
     });
 
-
     it('gets a transaction by user id', async() => {
 
         await request(app)
@@ -320,13 +279,31 @@ describe('transactions', () => {
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({
-                    action: 'buy',
                     currency: 'BTC',
                     exchange: 'Fake Market',
                     price: expect.any(Number),
                     quantity: expect.any(Number),
                     time: expect.any(String)
                 });
+            });
+    });
+
+    it('does not allow transactions if insufficient funds', async() => {
+        
+        let newTransaction = {
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: 50000000
+        };
+
+        await request(app)
+            .post('/api/users/transactions')
+            .set('Authorization', `Bearer ${createdToken}`)            
+            .send(newTransaction)
+            .then(res => {
+                expect(res.status).toEqual(403);
+                expect(res.body).toEqual({ 'error': 'Insufficient funds' });
             });
     });
 });

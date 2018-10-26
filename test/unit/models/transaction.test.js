@@ -6,7 +6,6 @@ describe('transaction model', () => {
     it('validates a good model', () => {
         const data = {
             user: Types.ObjectId(),
-            action: 'sell',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: 5,
@@ -23,10 +22,9 @@ describe('transaction model', () => {
         };
 
         const transaction = new Transaction(data);
-        const errors = getErrors(transaction.validateSync(), 6);
+        const errors = getErrors(transaction.validateSync(), 5);
 
         expect(errors.user.properties.message).toEqual('Path `user` is required.');
-        expect(errors.action.properties.message).toEqual('Path `action` is required.');        
         expect(errors.currency.properties.message).toEqual('Path `currency` is required.');
         expect(errors.exchange.properties.message).toEqual('Path `exchange` is required.');
         expect(errors.price.properties.message).toEqual('Path `price` is required.');
