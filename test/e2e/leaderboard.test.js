@@ -42,25 +42,33 @@ describe('leaderboard', () => {
         }));
 
         await Promise.all(createdTokens.map((token) => {
-            const holding1 = {
-                name: 'BTC',
+            const transaction1 = {
+                user: this._id,
+                action: 'buy',
+                currency: 'BTC',
+                exchange: 'Fake Market',
+                price: chance.natural(),
                 quantity: chance.natural({ min: 5, max: 15 })
             };
             return request(app)
                 .post('/api/users/transactions')
                 .set('Authorization', `Bearer ${token}`)
-                .send(holding1);
+                .send(transaction1);
         }));
 
         await Promise.all(createdTokens.map((token) => {
-            const holding2 = {
-                name: 'ETH',
+            const transaction2 = {
+                user: this._id,
+                action: 'buy',
+                currency: 'ETH',
+                exchange: 'Fake Market',
+                price: chance.natural(),
                 quantity: chance.natural({ min: 5, max: 15 })
             };
             return request(app)
                 .post('/api/users/transactions')
                 .set('Authorization', `Bearer ${token}`)
-                .send(holding2);
+                .send(transaction2);
         }));
 
         await request(app)
