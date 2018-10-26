@@ -45,7 +45,7 @@ const dropCollection = (name) => {
         .set('Authorization', `Bearer ${createdTokens[0]}`)
         .send(account);
     await request(app)
-        .post('/api/users/accounts/holdings')
+        .post('/api/users/transactions')
         .set('Authorization', `Bearer ${createdTokens[0]}`)
         .send(holding);
     await request(app)
