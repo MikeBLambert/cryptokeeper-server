@@ -32,7 +32,7 @@ describe('accounts and holdings', () => {
 
     it('creates an account for an authorized user', async() => {
         const account = {
-            exchange: 'Fake Market',
+            exchange: 'Make Farket',
         };
 
         await request(app)
@@ -109,7 +109,7 @@ describe('accounts and holdings', () => {
             });
     });
 
-    it('increments the value of a holding and decrements value in USD', async () => {
+    it('increments the value of a holding and decrements value in USD', async() => {
 
 
         const account = {
