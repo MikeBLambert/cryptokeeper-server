@@ -49,10 +49,24 @@ describe('get total USD', () => {
             exchange: 'Fake Market',
         };
 
-        let holdingsData1 = { name: 'BTC', quantity: 12 };
-        let holdingsData2 = { name: 'ETH', quantity: 80 };
+        let transactionData1 = {       
+            action: 'buy',
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: 12
+        };
 
-        let transactionData = {       
+
+        let transactionData2 = {       
+            action: 'buy',
+            currency: 'ETH',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: 80
+        };
+
+        let transactionData3 = {       
             action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
@@ -68,17 +82,17 @@ describe('get total USD', () => {
         await request(app)
             .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
-            .send(holdingsData1);
+            .send(transactionData1);
 
         await request(app)
             .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
-            .send(holdingsData2);
+            .send(transactionData2);
         
         await request(app)
             .post('/api/users/transactions')
             .set('Authorization', `Bearer ${token}`)            
-            .send(transactionData);
+            .send(transactionData3);
     });
 
     it('takes a user id and market data and returns total value of currencies in USD', () => {
