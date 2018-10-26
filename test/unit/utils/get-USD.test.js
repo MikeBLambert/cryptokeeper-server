@@ -1,12 +1,11 @@
 require('dotenv').config();
-const { getPrices } = require('../../../lib/exchanges/coin-market-cap');
-const { getTotalInUSD, getSingleValueInUSD } = require('../../../lib/util/get-USD');
+const { getTotalInUSD } = require('../../../lib/util/get-USD');
 const { dropCollection } = require('../../util/db');
 const app = require('../../../lib/app');
 const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
-const { checkStatus, signUp, signIn, applyUsers } = require('../../util/helpers');
+const { signUp, signIn, applyUsers } = require('../../util/helpers');
 
 
 jest.mock('../../../lib/streamer/api-watcher');
@@ -15,7 +14,6 @@ jest.mock('../../../lib/streamer/api-watcher');
 describe('get total USD', () => {
     const users = applyUsers(1);
     let createdUsers;
-    let createdToken;
     let token;
 
     let marketData = {
