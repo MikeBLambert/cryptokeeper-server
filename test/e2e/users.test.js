@@ -315,7 +315,7 @@ describe('transactions', () => {
     it('gets a transaction by user id', async() => {
 
         await request(app)
-            .get('/api/users/transactions/anyid')
+            .get('/api/users/transactions')
             .set('Authorization', `Bearer ${createdToken}`)
             .then(res => {
                 checkStatus(200)(res);

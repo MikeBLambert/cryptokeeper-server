@@ -44,7 +44,7 @@ describe('leaderboard', () => {
         await Promise.all(createdTokens.map((token) => {
             const holding1 = {
                 name: 'BTC',
-                quantity: chance.natural()
+                quantity: chance.natural({ min: 5, max: 15 })
             };
             return request(app)
                 .post('/api/users/accounts/holdings')
@@ -55,7 +55,7 @@ describe('leaderboard', () => {
         await Promise.all(createdTokens.map((token) => {
             const holding2 = {
                 name: 'ETH',
-                quantity: chance.natural()
+                quantity: chance.natural({ min: 5, max: 15 })
             };
             return request(app)
                 .post('/api/users/accounts/holdings')
