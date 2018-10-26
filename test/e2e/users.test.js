@@ -5,8 +5,6 @@ const request = require('supertest');
 const Chance = require('chance');
 const chance = new Chance();
 const { checkStatus, signUp, signIn, applyUsers } = require('../util/helpers');
-const mongoose = require('mongoose');
-
 
 jest.mock('../../lib/streamer/api-watcher');
 
@@ -75,7 +73,6 @@ describe('accounts and holdings', () => {
 
     it('creates a holding, increments its value, and decrements value in USD', async() => {
 
-
         const account = {
             exchange: 'Fake Market',
         };
@@ -109,7 +106,7 @@ describe('accounts and holdings', () => {
         await request(app)
             .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(change)
+            .send(change);
         await request(app)
             .get('/api/users/accounts')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
@@ -129,13 +126,11 @@ describe('accounts and holdings', () => {
             });
     });
 
-
     it('gets an account for an authorized user', async() => {
         const account = {
             exchange: 'Fake Market',
         };
 
-        // LEFT OFF HERE
         const transaction = {
             user: createdUsers[0]._id,
             action: 'buy',
@@ -165,7 +160,6 @@ describe('accounts and holdings', () => {
                 });
             });
     });
-
     
     it('gets an account total for a particular user', async() => {
         
@@ -209,22 +203,15 @@ describe('accounts and holdings', () => {
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual(expect.any(Number));
-            });
-
-        
+            });   
     });
-
 });
 
 describe('transactions', () => {
     
-
     const users = applyUsers(1);
     let createdUsers;
-    let createdAccounts;
     let createdToken;
-
-
 
     beforeEach(async() => {
         await Promise.all([
@@ -266,7 +253,6 @@ describe('transactions', () => {
             .send(transactionData);
     });
 
-
     it('creates a transaction', async() => {
 
         let newTransaction = {
@@ -275,7 +261,6 @@ describe('transactions', () => {
             exchange: 'Fake Market',
             price: chance.natural(),
             quantity: chance.natural({ min: 1, max: 15 })
-
         };
 
         await request(app)
@@ -292,7 +277,6 @@ describe('transactions', () => {
                 });
             });
     });
-
 
     it('gets a transaction by user id', async() => {
 
