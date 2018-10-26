@@ -5,7 +5,7 @@ const { createServer } = require('http');
 const app = require('./lib/app');
 
 const { startWatch } = require('./lib/streamer/api-watcher');
-startWatch();
+startWatch(process.env.COIN_MARKET_CAP_KEY);
 
 const port = process.env.PORT || 9876;
 
