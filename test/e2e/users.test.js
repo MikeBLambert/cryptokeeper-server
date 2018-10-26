@@ -295,5 +295,25 @@ describe('transactions', () => {
                 });
             });
     });
+
+    it('does not allow transactions if insufficient funds', async() => {
+        
+        let newTransaction = {
+            action: 'buy',
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: 50000000
+        };
+
+        await request(app)
+            .post('/api/users/transactions')
+            .set('Authorization', `Bearer ${createdToken}`)            
+            .send(newTransaction)
+            .then(res => {
+                expect(res.status).toEqual(403);
+                expect(res.body).toEqual({ 'error': 'Insufficient funds' });
+            });
+    });
 });
 
