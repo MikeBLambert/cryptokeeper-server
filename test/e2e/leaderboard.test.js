@@ -42,7 +42,6 @@ describe('leaderboard', () => {
         await Promise.all(createdTokens.map((token) => {
             const transaction1 = {
                 user: this._id,
-                action: 'buy',
                 currency: 'BTC',
                 exchange: 'Fake Market',
                 price: chance.natural(),
@@ -57,7 +56,6 @@ describe('leaderboard', () => {
         await Promise.all(createdTokens.map((token) => {
             const transaction2 = {
                 user: this._id,
-                action: 'buy',
                 currency: 'ETH',
                 exchange: 'Fake Market',
                 price: chance.natural(),
