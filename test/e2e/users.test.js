@@ -173,14 +173,22 @@ describe('accounts and holdings', () => {
             exchange: 'Fake Market',
         };
     
-        const holding = {
-            name: 'BTC',
-            quantity: 2
+        const transaction1 = {
+            user: createdUsers[0]._id,
+            action: 'buy',
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: chance.natural({ min: 1, max: 12 })
         };
     
-        const holding2 = {
-            name: 'BTC',
-            quantity: 5
+        const transaction2 = {
+            user: createdUsers[0]._id,
+            action: 'buy',
+            currency: 'BTC',
+            exchange: 'Fake Market',
+            price: chance.natural(),
+            quantity: chance.natural({ min: 1, max: 12 })
         };
 
         await request(app)
@@ -190,11 +198,11 @@ describe('accounts and holdings', () => {
         await request(app)
             .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(holding);
+            .send(transaction1);
         await request(app)
             .post('/api/users/transactions')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
-            .send(holding2);
+            .send(transaction2);
         await request(app)
             .get('/api/users/accounts/total')
             .set('Authorization', `Bearer ${createdTokens[0]}`)
