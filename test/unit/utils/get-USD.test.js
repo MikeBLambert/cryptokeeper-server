@@ -48,7 +48,6 @@ describe('get total USD', () => {
         };
 
         let transactionData1 = {       
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -57,7 +56,6 @@ describe('get total USD', () => {
 
 
         let transactionData2 = {       
-            action: 'buy',
             currency: 'ETH',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -65,7 +63,6 @@ describe('get total USD', () => {
         };
 
         let transactionData3 = {       
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
