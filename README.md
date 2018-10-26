@@ -11,8 +11,9 @@ _Using real-time market pricing, this simulation allows users to buy and sell th
 
 | ROUTE | TYPE | SEND | RECEIVE |
 |----------|:------:|------:| :---:|------:|
-| /leaderboard | GET |  |List of top10 users as ranked by their asset holdings in USD |
-_What to post to it, what you receive_
+| /api/auth/signup | POST | `{ name, email, password }` | `{ user: { name, email }, token: <bcrypt'd hash> }` |
+| /api/leaderboard | GET | `{ token: <bcrypt'd hash> }` |`List of users ranked` |
+
 
 
 ## Setup/Installation Requirements
@@ -44,66 +45,3 @@ Copyright (c) 2018 **_Claire Flanagan, Michael Lambert, and Jack Toumey_**
 
 
 
-
-Collapse 
- Alchemy Code Lab is on a roll
-Your team’s now 114 members strong, with 3094 messages sent across 9 channels. You can track your team’s progress via the main menu.
-
-Show Me
-Message Input
-
-Jot something down
-
-
-
-
-# Cryptokeeper
-
-## Tasks
-
-1. finish 'get top 10'
-1. do 'get transactions for user'
-1. get data showing up on the front end
-1. deploy to heroku
-1. complete view componenets
-1. fix contingency logic in put transactions
-1. add more exchanges
-1. add more coins
-1. make stuff fancier
-1. add a bot
-
-## App requirements:
-
-### Routes
-
-* ~~post /accounts~~
-* ~~post /transactions~~
-* ~~get /accounts by id~~
-* get /accounts for top 10 value
-* get /transactions for user id
-
-### Middleware
-
-* check prices and define current market value of an account
-    * used for 'get top 10' route
-
-### Business logic requirements
-
-* see account holdings
-* see market prices
-* initiate a transaction
-* see account leaderboard
-
-### UI requirements
-
-|resource|component|
-|--------|---------|
-|account holdings (single)|table and/or line chart|
-|market prices|table and/or line chart|
-|transaction|form submission|
-|account holdings (all)|table|
-
-
-### Docs to reference
-
-* we are using this API for market data: https://pro.coinmarketcap.com/api/v1#section/Introduction
