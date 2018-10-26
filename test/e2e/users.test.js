@@ -79,7 +79,6 @@ describe('accounts and holdings', () => {
 
         const transaction = {
             user: createdUsers[0]._id,
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -88,7 +87,6 @@ describe('accounts and holdings', () => {
 
         const change = {
             user: createdUsers[0]._id,
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -133,7 +131,6 @@ describe('accounts and holdings', () => {
 
         const transaction = {
             user: createdUsers[0]._id,
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -169,7 +166,6 @@ describe('accounts and holdings', () => {
     
         const transaction1 = {
             user: createdUsers[0]._id,
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -178,7 +174,6 @@ describe('accounts and holdings', () => {
     
         const transaction2 = {
             user: createdUsers[0]._id,
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -230,7 +225,6 @@ describe('transactions', () => {
         };
 
         let transactionData = {
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -256,7 +250,6 @@ describe('transactions', () => {
     it('creates a transaction', async() => {
 
         let newTransaction = {
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
@@ -286,7 +279,6 @@ describe('transactions', () => {
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({
-                    action: 'buy',
                     currency: 'BTC',
                     exchange: 'Fake Market',
                     price: expect.any(Number),
@@ -299,7 +291,6 @@ describe('transactions', () => {
     it('does not allow transactions if insufficient funds', async() => {
         
         let newTransaction = {
-            action: 'buy',
             currency: 'BTC',
             exchange: 'Fake Market',
             price: chance.natural(),
