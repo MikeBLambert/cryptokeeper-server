@@ -13,7 +13,6 @@ jest.mock('../../lib/streamer/api-watcher');
 describe('leaderboard', () => {
 
     const userTemplates = applyUsers(15);
-    let createdUsers;
     let createdTokens;
 
     beforeEach(async() => {
@@ -21,8 +20,7 @@ describe('leaderboard', () => {
             dropCollection('users'),
             dropCollection('accounts'),
         ]);
-        await Promise.all(userTemplates.map(signUp))
-            .then(cs => createdUsers = cs);
+        await Promise.all(userTemplates.map(signUp));
         await Promise.all(userTemplates.map(signIn))
             .then(cs => createdTokens = cs);
     });
