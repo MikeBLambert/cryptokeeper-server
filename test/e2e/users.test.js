@@ -252,7 +252,6 @@ describe('transactions', () => {
         let newTransaction = {
             currency: 'BTC',
             exchange: 'Fake Market',
-            price: chance.natural(),
             quantity: chance.natural({ min: 1, max: 15 })
         };
 
@@ -263,7 +262,10 @@ describe('transactions', () => {
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toEqual({ 
-                    ...newTransaction,
+                    currency: newTransaction.currency,
+                    exchange: newTransaction.exchange,
+                    quantity: newTransaction.quantity,
+                    price: expect.any(Number),
                     _id: expect.any(String),
                     user: createdUsers[0]._id.toString(),
                     time: expect.any(String)
