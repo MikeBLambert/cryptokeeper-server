@@ -10,7 +10,7 @@ _Using real-time market pricing, this simulation allows users to buy and sell th
 ## Routes
 
 | ROUTE | TYPE | SEND | RECEIVE |
-|----------|:------:|------:| :---:|------:|
+| ----- | ---- | ---- | ------- |
 | /api/auth/signup | POST | `{ name, email, password }` | `{ user: { name, email }, token: <bcrypt'd hash> }` |
 | /api/auth/signin | POST | `{ email, password }` | `{ user: { name, email }, token: <bcrypt'd hash> }` |
 | /api/auth/signin | POST | `{ email, password }` | `{ user: { name, email, roles: [] }, token: <bcrypt'd hash> }` |
