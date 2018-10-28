@@ -12,7 +12,7 @@ _Using real-time market pricing, this simulation allows users to buy and sell th
 | ROUTE | TYPE | SEND | RECEIVE |
 |----------|:------:|------:| :---:|------:|
 | /api/auth/signup | POST | `{ name, email, password }` | `{ user: { name, email }, token: <bcrypt'd hash> }` |
-| /api/leaderboard | GET | `{ token: <bcrypt'd hash> }` |`List of users ranked` |
+| /api/leaderboard | GET | `{ token: <bcrypt'd hash> }` |List of top10 users as ranked by their asset holdings in USD. `{_id: currencies: [{ name, quantity }], accounts: { exchange, currencies: [ name, quantity ] }, user: [{ name, email, roles }]}` |
 
 
 
