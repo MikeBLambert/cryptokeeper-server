@@ -7,6 +7,12 @@
 ## Description
 _Using real-time market pricing, this simulation allows users to buy and sell the world's top 10 cryptocurrencies (by market capitalization) and compete for status as the top trader._
 
+## Setup/Installation Requirements
+* _Download/Clone repository from Github_
+* _Use "npm i" command to install all dependencies_
+* _See .env-example file for configuration details_
+* _See package.json for script commands_
+
 ## Routes
 
 | ROUTE | TYPE | SEND | RECEIVE |
@@ -21,19 +27,6 @@ _Using real-time market pricing, this simulation allows users to buy and sell th
 | /api/users/transactions | POST | `{ token: <bcrypt'd hash> }`, `{ user, currency, exchange, quantity }` | `{ _id, user, time, exchange, currency, price }`
 | /api/users/transactions | GET | `{ token: <bcrypt'd hash> }` | `{ time, exchange, currency, price }`  
 | /api/leaderboard | GET | `{ token: <bcrypt'd hash> }` |List of top10 users as ranked by their asset holdings in USD. `{_id: currencies: [{ name, quantity }], accounts: { exchange, currencies: [ name, quantity ] }, user: [{ name, email, roles }]}` |
-
-
-
-## Setup/Installation Requirements
-* _This is a great place_
-* _to list setup instructions_
-* _in a simple_
-* _easy-to-understand_
-* _format_
-_{Leave nothing to chance! You want it to be easy for potential users, employers and collaborators to run your app. Do I need to run a server? How should I set up my databases? Is there other code this app depends on?}_
-
-## Known Bugs
-_{Are there issues that have not yet been resolved that you want to let users know you know?  Outline any issues that would impact use of your application.  Share any workarounds that are in place. }_
 
 ## Support and contact details
 _Please feel free to contact any member of **Definitely Not Robots** via Github:_
