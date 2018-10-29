@@ -73,7 +73,6 @@ describe('leaderboard', () => {
             .then(res => {
                 checkStatus(200)(res);
                 expect(res.body).toHaveLength(10);
-                // expect(res.body[0].usd).toBeGreaterThan(res.body[1].usd);
                 res.body.forEach(topUser => {
                     expect(topUser.user).toBeTruthy();
                     expect(topUser.usd).toEqual(expect.any(Number));
