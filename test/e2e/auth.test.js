@@ -68,7 +68,6 @@ describe('auth routes', () => {
             .post('/api/auth/signup')
             .send({ name: 'ryan', email: 'ryan@ryan.com', clearPassword: 'testing1234' })
             .then(({ body: user }) => {
-                // const user = res.body
                 expect(user).toEqual({ 
                     user: {
                         _id: expect.any(String), 
@@ -129,17 +128,4 @@ describe('auth routes', () => {
             });
 
     });
-
-    // it('creates an auth token', () => {
-    //     return createdUsers[0].authToken()
-    //         .then(token => {
-    //             expect(token).toEqual(expect.any(String));
-    //             return token;
-    //         })
-    //         .then(token => {
-    //             return User.verifyToken(token).then(user => {
-    //                 expect(user).toEqual({});
-    //             });
-    //         });
-    // });
 });
