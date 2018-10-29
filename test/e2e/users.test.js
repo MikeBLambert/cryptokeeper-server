@@ -81,7 +81,6 @@ describe('accounts and holdings', () => {
             user: createdUsers[0]._id,
             currency: 'BTC',
             exchange: 'Fake Market',
-            price: chance.natural(),
             quantity: 4
         };
 
@@ -89,7 +88,6 @@ describe('accounts and holdings', () => {
             user: createdUsers[0]._id,
             currency: 'BTC',
             exchange: 'Fake Market',
-            price: chance.natural(),
             quantity: 2
         };
 
@@ -133,7 +131,6 @@ describe('accounts and holdings', () => {
             user: createdUsers[0]._id,
             currency: 'BTC',
             exchange: 'Fake Market',
-            price: chance.natural(),
             quantity: chance.natural({ min: 1, max: 12 })
         };
 
@@ -168,7 +165,6 @@ describe('accounts and holdings', () => {
             user: createdUsers[0]._id,
             currency: 'BTC',
             exchange: 'Fake Market',
-            price: chance.natural(),
             quantity: chance.natural({ min: 1, max: 12 })
         };
     
@@ -176,7 +172,6 @@ describe('accounts and holdings', () => {
             user: createdUsers[0]._id,
             currency: 'BTC',
             exchange: 'Fake Market',
-            price: chance.natural(),
             quantity: chance.natural({ min: 1, max: 12 })
         };
 
@@ -227,7 +222,6 @@ describe('transactions', () => {
         let transactionData = {
             currency: 'BTC',
             exchange: 'Fake Market',
-            price: chance.natural(),
             quantity: chance.natural()
         };
 
