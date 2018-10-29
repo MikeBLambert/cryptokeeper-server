@@ -1,4 +1,3 @@
-// const { dropCollection } = require('../util/db');
 const request = require('superagent');
 const Chance = require('chance');
 const chance = new Chance();
