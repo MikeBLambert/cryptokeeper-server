@@ -2,7 +2,7 @@
 
 ### A multi-user cryptocurrency trading simulation, October 26, 2018
 
-##### By _** Definitely Not Robots (AKA: Claire Flanagan, Mike Lambert, and Jack Toumey)**_
+##### By _**Definitely Not Robots (AKA: Claire Flanagan, Mike Lambert, and Jack Toumey)**_
 
 ## Description
 _Using real-time market pricing, this simulation allows users to buy and sell the world's top 10 cryptocurrencies (by market capitalization) and compete for status as the top trader._
